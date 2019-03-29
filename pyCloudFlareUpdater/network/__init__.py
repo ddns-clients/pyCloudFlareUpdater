@@ -1,4 +1,4 @@
-#                             pyGoDaddyAUpdater
+#                             pyCloudFlareUpdater
 #                  Copyright (C) 2019 - Javinator9889
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -13,4 +13,5 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
-from ..preferences.user_preferences import UserPreferences
+from ..network.network_utils import GoDaddy
+from ..network.network_utils import get_machine_public_ip

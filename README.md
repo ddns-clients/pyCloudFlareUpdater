@@ -3,8 +3,8 @@
 *DDNS Service for updating dynamically your GoDaddy 'A' Records when your public IP changes*
 
 [![PyPi](https://img.shields.io/badge/v1.1%20-PyPi-green.svg)](https://pypi.org/project/pyGoDaddyUpdater/)
-[![ZIP](https://img.shields.io/badge/Package%20-Zip-green.svg)](https://gitlab.javinator9889.com/Javinator9889/pyGoDaddyAUpdater/repository/master/archive.zip)
-[![GIT](https://img.shields.io/badge/Package%20-Git-green.svg)](https://gitlab.javinator9889.com/Javinator9889/pyGoDaddyAUpdater.git)
+[![ZIP](https://img.shields.io/badge/Package%20-Zip-green.svg)](https://gitlab.javinator9889.com/Javinator9889/pyCloudFlareUpdater/repository/master/archive.zip)
+[![GIT](https://img.shields.io/badge/Package%20-Git-green.svg)](https://gitlab.javinator9889.com/Javinator9889/pyCloudFlareUpdater.git)
 [![Downloads](https://pepy.tech/badge/pygodaddyupdater)](https://pepy.tech/project/pygodaddyupdater)
 
 ## Index
@@ -39,7 +39,7 @@ There are two possibilities for installing this script:
    Start by *cloning* this repository. For that, you will need to have 
    [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) installed. Then, run on Git Bash:
    ```text
-   git clone https://gitlab.javinator9889.com/Javinator9889/pyGoDaddyAUpdater.git
+   git clone https://gitlab.javinator9889.com/Javinator9889/pyCloudFlareUpdater.git
    ```
    
    There is another possibility so you can *directly download* a compressed file with all the necessary data. Just unzip
@@ -48,7 +48,7 @@ There are two possibilities for installing this script:
    For installing, you will need **administrator** permissions, as the script is creating a new command so you can run
    it from everywhere:
    ```text
-   cd pyGoDaddyAUpdater
+   cd pyCloudFlareUpdater
    sudo python3 setup.py install
    ```
    
@@ -120,7 +120,7 @@ to include the options mentioned above.
 ### License
 
 ```text
-                             pyGoDaddyAUpdater
+                             pyCloudFlareUpdater
                   Copyright (C) 2019 - Javinator9889
 
     This program is free software: you can redistribute it and/or modify

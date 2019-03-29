@@ -11,14 +11,14 @@ with open(path.join(this, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name='pyGoDaddyUpdater',
+    name='pyCloudFlareUpdater',
     version='1.1',
-    packages=['pyGoDaddyUpdater',
-              'pyGoDaddyUpdater.values',
-              'pyGoDaddyUpdater.network',
-              'pyGoDaddyUpdater.preferences',
-              'pyGoDaddyUpdater.logging_utils'],
-    url='https://gitlab.javinator9889.com/Javinator9889/pyGoDaddyAUpdater',
+    packages=['pyCloudFlareUpdater',
+              'pyCloudFlareUpdater.values',
+              'pyCloudFlareUpdater.network',
+              'pyCloudFlareUpdater.preferences',
+              'pyCloudFlareUpdater.logging_utils'],
+    url='https://gitlab.javinator9889.com/Javinator9889/pyCloudFlareUpdater',
     license='GPL-3.0',
     author='Javinator9889',
     author_email='javialonso007@hotmail.es',
@@ -27,9 +27,9 @@ setup(
     long_description_content_type='text/markdown',
     include_package_data=False,
     zip_safe=True,
-    download_url="https://gitlab.javinator9889.com/Javinator9889/pyGoDaddyAUpdater/repository/master/archive.zip",
+    download_url="https://gitlab.javinator9889.com/Javinator9889/pyCloudFlareUpdater/repository/master/archive.zip",
     entry_points={
-        'console_scripts': ['godaddy_ddns=pyGoDaddyUpdater.__main__:parser']
+        'console_scripts': ['godaddy_ddns=pyCloudFlareUpdater.__main__:parser']
     },
     install_requires=['daemonize'],
     classifiers=[
