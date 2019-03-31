@@ -91,7 +91,7 @@ def parser():
     args.add_argument("--time",
                       type=int,
                       default=SUPPRESS,
-                      required=is_first_execution,
+                      required=False,
                       help="Time (in minutes) to check for updated IP (defaults: 5 min.) - must be higher than 0.")
     args.add_argument("--key",
                       type=str,
