@@ -69,7 +69,7 @@ def main():
         log.warning("Received SIGINT - exiting...")
     except Exception as e:
         log.error("Exception registered! - " + str(e))
-        log.exception("Stacktrace: " + traceback.format_exc())
+        log.error("Stacktrace: " + traceback.format_exc())
     finally:
         preferences.save_preferences()
         exit(0)
