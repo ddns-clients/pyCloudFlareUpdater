@@ -33,7 +33,7 @@ preferences = UserPreferences()
 
 
 def main():
-    log = LoggingHandler(logs=[getLogger("appLogger")])
+    log = LoggingHandler(logs=[getLogger("cloudflareLogger")])
     loop_continuation = True
     try:
         net = CloudFlare(domain=preferences.get_domain(),
@@ -67,6 +67,7 @@ def main():
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
     except Exception as e:
+        log.error("Exception registered! - " + str(e))
         log.exception("Daemon raised an exception! - " + str(e), exc_info=True)
     finally:
         preferences.save_preferences()
@@ -179,7 +180,7 @@ def parser():
         preferences.save_preferences(p_args.preferences)
     if not is_first_execution:
         preferences.load_preferences()
-    file_handler = setup_logging("appLogger", preferences.get_log_file())
+    file_handler = setup_logging("cloudflareLogger", preferences.get_log_file())
     fds = [file_handler.stream.fileno()]
     pid_dir = path.dirname(path.abspath(preferences.get_pid_file()))
     if not path.exists(pid_dir):
@@ -191,7 +192,7 @@ def parser():
                        keep_fds=fds,
                        user=user,
                        group=group,
-                       logger=getLogger("appLogger"))
+                       logger=getLogger("cloudflareLogger"))
     daemon.start()
 
 
