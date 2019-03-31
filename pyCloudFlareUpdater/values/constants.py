@@ -16,3 +16,4 @@
 description = """pyCloudFlareUpdater\n\n
 The first time this application is executed, all params must be included in order to save the user preferences 
 and do this process automatically."""
+cloudflare_base_url = """"https://api.cloudflare.com/client/v4/{0}"""

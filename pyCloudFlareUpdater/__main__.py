@@ -24,7 +24,7 @@ from daemonize import Daemonize
 
 from .logging_utils import LoggingHandler
 from .logging_utils import setup_logging
-from .network import GoDaddy
+from .network import CloudFlare
 from .network import get_machine_public_ip
 from .preferences import UserPreferences
 from .values import description
@@ -35,19 +35,19 @@ preferences = UserPreferences()
 def main():
     loop_continuation = True
     log = LoggingHandler(logs=[getLogger("appLogger")])
-    net = GoDaddy(preferences.get_domain(), preferences.get_name(), preferences.get_key(), preferences.get_secret())
+    net = CloudFlare(preferences.get_domain(), preferences.get_name(), preferences.get_key(), preferences.get_secret())
     try:
         while loop_continuation:
             current_ip = get_machine_public_ip()
             log.info("Current machine IP: \"{0}\"".format(current_ip))
             if preferences.get_latest_ip() == "0.0.0.0":
-                preferences.set_latest_ip(net.get_godaddy_latest_ip())
+                preferences.set_latest_ip(net.get_cloudflare_latest_ip())
                 log.warning("User saved latest IP is not up to date - downloading GoDaddy A Record value: \"{0}\""
                             .format(preferences.get_latest_ip()))
             if preferences.get_latest_ip() != current_ip:
                 log.info("IP needs an upgrade - OLD IP: {0} | NEW IP: {1}"
                          .format(preferences.get_latest_ip(), current_ip))
-                result = net.set_goddady_ip(current_ip)
+                result = net.set_cloudflare_ip(current_ip)
                 log.info("IP updated correctly! - Operation return code: {0}".format(result))
                 log.debug("Updating saved IP...")
                 preferences.set_latest_ip(current_ip)

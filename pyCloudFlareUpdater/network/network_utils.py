@@ -21,33 +21,76 @@ def get_machine_public_ip():
     return urllib.request.urlopen('https://ident.me').read().decode('utf8')
 
 
-class GoDaddy(object):
-    def __init__(self, domain, name, key, secret):
+class CloudFlare(object):
+    def __init__(self, domain, name, key, mail):
         self.__domain = domain
         self.__name = name
-        self.__headers = "sso-key {0}:{1}".format(key, secret)
+        self.__zone = self._get_zone()
+        self.__headers = {"X-Auth-Email": mail,
+                          "X-Auth-Key": key,
+                          "Content-Type": "application/json"}
+        self.__id = self._get_identifier()
 
-    def get_godaddy_latest_ip(self):
+    def _get_zone(self):
+        try:
+            import ujson as json
+        except ImportError:
+            import json
         from urllib.request import Request, urlopen
-        from re import search
 
-        request = Request("https://api.godaddy.com/v1/domains/{0}/records/A/{1}".format(self.__domain, self.__name))
-        request.add_header("Authorization", self.__headers)
-        result = urlopen(request).read().decode('utf8')
+        from ..values import cloudflare_base_url
 
-        ip = search("([0-9]{1,3}\.){3}[0-9]{1,3}", result)
-        return ip.group(0) if ip else "0.0.0.0"
+        url_extra_attrs = "zones?name={0}&status=active&page=1&per_page=1&match=all".format(self.__name)
+        request = Request(cloudflare_base_url.format(url_extra_attrs), headers=self.__headers)
+        result = json.loads(urlopen(request).read().decode("utf8"))
+        if not result["success"]:
+            raise ValueError("CloudFlare returned error code with the request data - more info: " + result["errors"][0])
 
-    def set_goddady_ip(self, ip):
+        return result["result"][0]["id"]
+
+    def _get_identifier(self):
+        try:
+            import ujson as json
+        except ImportError:
+            import json
         from urllib.request import Request, urlopen
+
+        from ..values import cloudflare_base_url
+
+        url_extra_attrs = "zones/{0}/dns_records?type=A&name={1}&page=1&per_page=1".format(self.__zone, self.__name)
+        request = Request(cloudflare_base_url.format(url_extra_attrs), headers=self.__headers)
+        result = json.loads(urlopen(request).read().decode("utf8"))
+        if not result["success"]:
+            raise ValueError("CloudFlare returned error code with the request data - more info: " + result["errors"][0])
+
+        return result["result"][0]["id"]
+
+    def get_cloudflare_latest_ip(self):
+        try:
+            import ujson as json
+        except ImportError:
+            import json
+        from urllib.request import Request, urlopen
+        from ..values import cloudflare_base_url
+
+        url_extra_attrs = "zones/{0}/dns_records/{1}".format(self.__zone, self.__id)
+        request = Request(cloudflare_base_url.format(url_extra_attrs), headers=self.__headers)
+        result = json.loads(urlopen(request).read().decode("utf8"))
+
+        return result["result"]["content"]
+
+    def set_cloudflare_ip(self, ip):
         try:
             from ujson import dumps
         except ImportError:
             from json import dumps
+        from urllib.request import Request, urlopen
+        from ..values import cloudflare_base_url
 
-        data = dumps([{"data": ip, "ttl": 600, "name": self.__name, "type": "A"}])
-        request = Request(url="https://api.godaddy.com/v1/domains/{0}/records/A/{1}".format(self.__domain, self.__name),
+        data = dumps({"type": "A", "name": self.__name, "content": ip, "ttl": 600, "proxied": False})
+        url_extra_attrs = "zones/{0}/dns_records/{1}".format(self.__zone, self.__id)
+        request = Request(url=cloudflare_base_url.format(url_extra_attrs),
                           data=data.encode("utf-8"),
-                          headers={"Authorization": self.__headers, "Content-Type": "application/json"},
+                          headers=self.__headers,
                           method="PUT")
         return urlopen(request).getcode()
