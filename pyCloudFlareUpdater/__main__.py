@@ -33,16 +33,19 @@ preferences = UserPreferences()
 
 
 def main():
-    loop_continuation = True
     log = LoggingHandler(logs=[getLogger("appLogger")])
-    net = CloudFlare(preferences.get_domain(), preferences.get_name(), preferences.get_key(), preferences.get_secret())
+    loop_continuation = True
     try:
+        net = CloudFlare(domain=preferences.get_domain(),
+                         name=preferences.get_name(),
+                         key=preferences.get_key(),
+                         mail=preferences.get_mail())
         while loop_continuation:
             current_ip = get_machine_public_ip()
             log.info("Current machine IP: \"{0}\"".format(current_ip))
             if preferences.get_latest_ip() == "0.0.0.0":
                 preferences.set_latest_ip(net.get_cloudflare_latest_ip())
-                log.warning("User saved latest IP is not up to date - downloading GoDaddy A Record value: \"{0}\""
+                log.warning("User saved latest IP is not up to date - downloading CloudFlare A Record value: \"{0}\""
                             .format(preferences.get_latest_ip()))
             if preferences.get_latest_ip() != current_ip:
                 log.info("IP needs an upgrade - OLD IP: {0} | NEW IP: {1}"
@@ -63,8 +66,11 @@ def main():
                 sleep(preferences.get_time())
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
+    except Exception as e:
+        log.exception("Daemon raised an exception! - " + str(e), exc_info=True)
+    finally:
         preferences.save_preferences()
-        exit(1)
+        exit(0)
 
 
 def parser():
@@ -74,11 +80,11 @@ def parser():
     args.add_argument("--domain",
                       type=str,
                       required=is_first_execution,
-                      help="GoDaddy domain to be updated.")
+                      help="CloudFlare domain to be updated.")
     args.add_argument("--name",
                       type=str,
                       required=is_first_execution,
-                      help="GoDaddy 'A' Record name.")
+                      help="CloudFlare 'A' Record name.")
     args.add_argument("--time",
                       type=int,
                       default=SUPPRESS,
@@ -87,11 +93,11 @@ def parser():
     args.add_argument("--key",
                       type=str,
                       required=is_first_execution,
-                      help="GoDaddy developer key.")
-    args.add_argument("--secret",
+                      help="CloudFlare API key.")
+    args.add_argument("--mail",
                       type=str,
                       required=is_first_execution,
-                      help="GoDaddy developer secret.")
+                      help="CloudFlare sign-in mail.")
     args.add_argument("--no_daemonize",
                       action="store_true",
                       required=False,
@@ -112,7 +118,7 @@ def parser():
                       help="Specifies a custom LOG file for storing current daemon logs.")
     args.add_argument("--preferences",
                       type=str,
-                      default="user.preferences",
+                      default="cloudflare.user.preferences",
                       required=False,
                       metavar="PREFERENCES FILE",
                       help="Provide a custom preferences file - useful for multiple running daemon for different 'A'"
@@ -146,8 +152,8 @@ def parser():
     if p_args.key:
         preferences.set_key(p_args.key)
         should_save_preferences = True
-    if p_args.secret:
-        preferences.set_secret(p_args.secret)
+    if p_args.mail:
+        preferences.set_mail(p_args.mail)
         should_save_preferences = True
     if p_args.no_daemonize:
         preferences.run_as_daemon(not p_args.no_daemonize)
@@ -156,18 +162,18 @@ def parser():
         should_save_preferences = True
     else:
         if preferences.get_pid_file() is None:
-            preferences.set_pid_file("/var/run/pygoddady.pid")
+            preferences.set_pid_file("/var/run/cloudflare.pid")
     if "log" in p_args:
         preferences.set_log_file(p_args.log)
         should_save_preferences = True
     else:
         if preferences.get_log_file() is None:
-            preferences.set_log_file("/var/log/pygoddady.log")
+            preferences.set_log_file("/var/log/cloudflare.log")
     user = p_args.user
     group = p_args.group
 
     if preferences:
-        if not (p_args.domain and p_args.name and p_args.key and p_args.secret):
+        if not (p_args.domain and p_args.name and p_args.key and p_args.mail):
             print("You must provide the required params for a new preferences file")
     if should_save_preferences:
         preferences.save_preferences(p_args.preferences)
@@ -179,7 +185,7 @@ def parser():
     if not path.exists(pid_dir):
         makedirs(path=pid_dir, exist_ok=True)
 
-    daemon = Daemonize(app="pyGoDaddyDaemon",
+    daemon = Daemonize(app="pyCloudFlareDaemon",
                        pid=preferences.get_pid_file(),
                        action=main,
                        keep_fds=fds,

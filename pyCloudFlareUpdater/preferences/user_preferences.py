@@ -23,7 +23,7 @@ class UserPreferences(object):
                 self.__name = kwargs["name"]
                 self.__time = kwargs["time"]
                 self.__key = kwargs["key"]
-                self.__secret = kwargs["secret"]
+                self.__mail = kwargs["mail"]
                 self.__pid = kwargs["pid"]
                 self.__log = kwargs["log"]
             except KeyError:
@@ -32,14 +32,13 @@ class UserPreferences(object):
                                      "  - Domain\n"
                                      "  - Name (of A Record)\n"
                                      "  - Time (update time)\n"
-                                     "  - Key\n"
-                                     "  - Secret\n")
+                                     "  - Key\n")
         else:
             self.__domain = None
             self.__name = None
             self.__time = None
             self.__key = None
-            self.__secret = None
+            self.__mail = None
             self.__pid = None
             self.__log = None
         self.__latest_ip = "0.0.0.0"
@@ -49,7 +48,7 @@ class UserPreferences(object):
     def get_preferences_file():
         import os
 
-        return os.path.dirname(os.path.abspath(__file__)) + "/user.preferences"
+        return os.path.dirname(os.path.abspath(__file__)) + "/cloudflare.user.preferences"
 
     def load_preferences(self):
         import pickle
@@ -61,9 +60,9 @@ class UserPreferences(object):
             with open("user.preferences", "rb") as fpreferences:
                 preferences = pickle.load(fpreferences)
             self.__domain = preferences["domain"]
-            self.__secret = b64decode(preferences["secret"]).decode("utf-8")
             self.__time = preferences["time"]
             self.__key = b64decode(preferences["key"]).decode("utf-8")
+            self.__mail = b64decode(preferences["mail"]).decode("utf-8")
             self.__name = preferences["name"]
             self.__latest_ip = preferences["latest_ip"]
             self.__pid = preferences["pid"]
@@ -82,7 +81,7 @@ class UserPreferences(object):
                        "name": self.__name,
                        "time": self.__time,
                        "key": b64encode(bytes(self.__key, "utf-8")),
-                       "secret": b64encode(bytes(self.__secret, "utf-8")),
+                       "mail": b64encode(bytes(self.__mail, "utf-8")),
                        "latest_ip": self.__latest_ip,
                        "pid": self.__pid,
                        "log": self.__log}
@@ -104,8 +103,8 @@ class UserPreferences(object):
     def get_key(self):
         return self.__key
 
-    def get_secret(self):
-        return self.__secret
+    def get_mail(self):
+        return self.__mail
 
     def get_latest_ip(self):
         return self.__latest_ip
@@ -131,8 +130,8 @@ class UserPreferences(object):
     def set_key(self, key):
         self.__key = key
 
-    def set_secret(self, secret):
-        self.__secret = secret
+    def set_mail(self, mail):
+        self.__mail = mail
 
     def set_latest_ip(self, ip):
         self.__latest_ip = ip
@@ -150,4 +149,4 @@ class UserPreferences(object):
     def are_preferences_stored():
         import os
 
-        return os.path.exists("user.preferences")
+        return os.path.exists("cloudflare.user.preferences")

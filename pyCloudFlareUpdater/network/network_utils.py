@@ -25,10 +25,10 @@ class CloudFlare(object):
     def __init__(self, domain, name, key, mail):
         self.__domain = domain
         self.__name = name
-        self.__zone = self._get_zone()
         self.__headers = {"X-Auth-Email": mail,
                           "X-Auth-Key": key,
                           "Content-Type": "application/json"}
+        self.__zone = self._get_zone()
         self.__id = self._get_identifier()
 
     def _get_zone(self):
