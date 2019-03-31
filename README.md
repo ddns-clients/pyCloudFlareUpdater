@@ -1,4 +1,4 @@
-# GoDaddy 'A' Record Updater
+# CloudFlare 'A' Record Updater
 
 *DDNS Service for updating dynamically your CloudFlare 'A' Records when your public IP changes*
 
