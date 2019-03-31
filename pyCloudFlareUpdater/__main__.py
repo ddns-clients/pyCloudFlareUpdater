@@ -40,7 +40,8 @@ def main():
         net = CloudFlare(domain=preferences.get_domain(),
                          name=preferences.get_name(),
                          key=preferences.get_key(),
-                         mail=preferences.get_mail())
+                         mail=preferences.get_mail(),
+                         proxied=preferences.is_record_behind_proxy())
         while loop_continuation:
             current_ip = get_machine_public_ip()
             log.info("Current machine IP: \"{0}\"".format(current_ip))
@@ -100,6 +101,12 @@ def parser():
                       type=str,
                       required=is_first_execution,
                       help="CloudFlare sign-in mail.")
+    args.add_argument("--proxied",
+                      action="store_true",
+                      required=is_first_execution,
+                      default=False,
+                      help="Set this value if you want your 'A' Record to be behind the Cloudflare proxy "
+                           "(disabled by default).")
     args.add_argument("--no_daemonize",
                       action="store_true",
                       required=False,
@@ -174,13 +181,16 @@ def parser():
     user = p_args.user
     group = p_args.group
 
-    if preferences:
+    if p_args.preferences:
         if not (p_args.domain and p_args.name and p_args.key and p_args.mail):
             print("You must provide the required params for a new preferences file")
     if should_save_preferences:
         preferences.save_preferences(p_args.preferences)
     if not is_first_execution:
         preferences.load_preferences()
+    if preferences.is_record_behind_proxy() != p_args.proxied:
+        preferences.record_behind_proxy(p_args.proxied)
+        preferences.save_preferences()
     file_handler = setup_logging("cloudflareLogger", preferences.get_log_file())
     fds = [file_handler.stream.fileno()]
     pid_dir = path.dirname(path.abspath(preferences.get_pid_file()))

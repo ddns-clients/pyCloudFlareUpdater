@@ -24,6 +24,7 @@ class UserPreferences(object):
                 self.__time = kwargs["time"]
                 self.__key = kwargs["key"]
                 self.__mail = kwargs["mail"]
+                self.__proxy = kwargs["proxy"]
                 self.__pid = kwargs["pid"]
                 self.__log = kwargs["log"]
             except KeyError:
@@ -42,6 +43,7 @@ class UserPreferences(object):
             self.__pid = None
             self.__log = None
         self.__latest_ip = "0.0.0.0"
+        self.__proxy = True
         self.__daemonize = True
 
     @staticmethod
@@ -64,6 +66,7 @@ class UserPreferences(object):
             self.__key = b64decode(preferences["key"]).decode("utf-8")
             self.__mail = b64decode(preferences["mail"]).decode("utf-8")
             self.__name = preferences["name"]
+            self.__proxy = preferences["proxy"]
             self.__latest_ip = preferences["latest_ip"]
             self.__pid = preferences["pid"]
             self.__log = preferences["log"]
@@ -82,6 +85,7 @@ class UserPreferences(object):
                        "time": self.__time,
                        "key": b64encode(bytes(self.__key, "utf-8")),
                        "mail": b64encode(bytes(self.__mail, "utf-8")),
+                       "proxy": self.__proxy,
                        "latest_ip": self.__latest_ip,
                        "pid": self.__pid,
                        "log": self.__log}
@@ -105,6 +109,9 @@ class UserPreferences(object):
 
     def get_mail(self):
         return self.__mail
+
+    def is_record_behind_proxy(self):
+        return self.__proxy
 
     def get_latest_ip(self):
         return self.__latest_ip
@@ -141,6 +148,9 @@ class UserPreferences(object):
 
     def set_log_file(self, log):
         self.__log = log
+
+    def record_behind_proxy(self, behind_proxy: bool):
+        self.__proxy = behind_proxy
 
     def run_as_daemon(self, daemonize: bool):
         self.__daemonize = daemonize

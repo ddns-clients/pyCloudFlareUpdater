@@ -22,12 +22,13 @@ def get_machine_public_ip():
 
 
 class CloudFlare(object):
-    def __init__(self, domain, name, key, mail):
+    def __init__(self, domain, name, key, mail, proxied):
         self.__domain = domain
         self.__name = name
         self.__headers = {"X-Auth-Email": mail,
                           "X-Auth-Key": key,
                           "Content-Type": "application/json"}
+        self.__proxied = proxied
         self.__zone = self._get_zone()
         self.__id = self._get_identifier()
 
@@ -87,7 +88,7 @@ class CloudFlare(object):
         from urllib.request import Request, urlopen
         from ..values import cloudflare_base_url
 
-        data = dumps({"type": "A", "name": self.__name, "content": ip, "ttl": 600, "proxied": False})
+        data = dumps({"type": "A", "name": self.__name, "content": ip, "ttl": 600, "proxied": self.__proxied})
         url_extra_attrs = "zones/{0}/dns_records/{1}".format(self.__zone, self.__id)
         request = Request(url=cloudflare_base_url.format(url_extra_attrs),
                           data=data.encode("utf-8"),
