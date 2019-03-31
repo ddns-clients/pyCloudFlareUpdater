@@ -13,6 +13,7 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
+import traceback
 from argparse import ArgumentParser
 from argparse import SUPPRESS
 from logging import getLogger
@@ -68,7 +69,7 @@ def main():
         log.warning("Received SIGINT - exiting...")
     except Exception as e:
         log.error("Exception registered! - " + str(e))
-        log.exception("Daemon raised an exception! - " + str(e), exc_info=True)
+        log.exception("Stacktrace: " + traceback.format_exc())
     finally:
         preferences.save_preferences()
         exit(0)
