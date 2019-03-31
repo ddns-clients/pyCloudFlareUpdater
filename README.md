@@ -2,10 +2,10 @@
 
 *DDNS Service for updating dynamically your CloudFlare 'A' Records when your public IP changes*
 
-[![PyPi](https://img.shields.io/badge/v1.0%20-PyPi-green.svg)](https://pypi.org/project/pyGoDaddyUpdater/)
+[![PyPi](https://img.shields.io/badge/v1.0%20-PyPi-green.svg)](https://pypi.org/project/pyCloudFlareUpdater/)
 [![ZIP](https://img.shields.io/badge/Package%20-Zip-green.svg)](https://gitlab.javinator9889.com/ddns-clients/pyCloudFlareUpdater/repository/master/archive.zip)
 [![GIT](https://img.shields.io/badge/Package%20-Git-green.svg)](https://gitlab.javinator9889.com/ddns-clients/pyCloudFlareUpdater.git)
-[![Downloads](https://pepy.tech/badge/pygodaddyupdater)](https://pepy.tech/project/pygodaddyupdater)
+[![Downloads](https://pepy.tech/badge/pycloudflareupdater)](https://pepy.tech/project/pycloudflareupdater)
 
 ## Index
 
@@ -87,8 +87,7 @@ The available options are:
  + `--domain DOMAIN`: specifies **which domain** will be updated. That is, if your site is hosted at www.example.com, then your
  domain is *example.com*.
  
- + `--name NAME`: here the 'A' Record name must be included. In most cases, this name usually is `@` (the name pointing to 
- the host).
+ + `--name NAME`: here the 'A' Record name must be included. In most cases, this name usually matches the domain.
  
  + `--time TIME`: change the *update check interval* time (in minutes). By default, it is 5 minutes.
  
