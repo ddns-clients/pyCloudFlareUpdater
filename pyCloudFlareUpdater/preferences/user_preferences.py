@@ -56,8 +56,8 @@ class UserPreferences(object):
 
         from base64 import b64decode
 
-        if os.path.exists("user.preferences"):
-            with open("user.preferences", "rb") as fpreferences:
+        if os.path.exists("cloudflare.user.preferences"):
+            with open("cloudflare.user.preferences", "rb") as fpreferences:
                 preferences = pickle.load(fpreferences)
             self.__domain = preferences["domain"]
             self.__time = preferences["time"]
@@ -70,7 +70,7 @@ class UserPreferences(object):
         else:
             raise FileNotFoundError("There are no saved user preferences. Call \"save_preferences\" the first time")
 
-    def save_preferences(self, filename="user.preferences"):
+    def save_preferences(self, filename="cloudflare.user.preferences"):
         import pickle
 
         from base64 import b64encode
