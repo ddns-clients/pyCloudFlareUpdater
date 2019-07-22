@@ -16,10 +16,13 @@
 import traceback
 from argparse import ArgumentParser
 from argparse import SUPPRESS
+from logging import WARNING
 from logging import getLogger
 from os import makedirs
 from os import path
+from socket import gaierror
 from time import sleep
+from urllib.error import URLError
 
 from daemonize import Daemonize
 
@@ -43,29 +46,34 @@ def main():
                          mail=preferences.get_mail(),
                          proxied=preferences.is_record_behind_proxy())
         while loop_continuation:
-            current_ip = get_machine_public_ip()
-            log.info("Current machine IP: \"{0}\"".format(current_ip))
-            if preferences.get_latest_ip() == "0.0.0.0":
-                preferences.set_latest_ip(net.get_cloudflare_latest_ip())
-                log.warning("User saved latest IP is not up to date - downloading CloudFlare A Record value: \"{0}\""
+            try:
+                current_ip = get_machine_public_ip()
+                log.info("Current machine IP: \"{0}\"".format(current_ip))
+                if preferences.get_latest_ip() == "0.0.0.0":
+                    preferences.set_latest_ip(net.get_cloudflare_latest_ip())
+                    log.warning(
+                        "User saved latest IP is not up to date - downloading CloudFlare A Record value: \"{0}\""
                             .format(preferences.get_latest_ip()))
-            if preferences.get_latest_ip() != current_ip:
-                log.info("IP needs an upgrade - OLD IP: {0} | NEW IP: {1}"
-                         .format(preferences.get_latest_ip(), current_ip))
-                result = net.set_cloudflare_ip(current_ip)
-                log.info("IP updated correctly! - Operation return code: {0}".format(result))
-                log.debug("Updating saved IP...")
-                preferences.set_latest_ip(current_ip)
-            else:
-                log.info("IP has not changed - skipping")
-            if not preferences.is_running_as_daemon():
-                log.info("This script is only executed once. Finishing...")
-                loop_continuation = False
-            else:
-                log.info("Next check in about {0} minute{1}"
-                         .format((preferences.get_time() / 60),
-                                 's' if (preferences.get_time() / 60) > 1 else ''))
-                sleep(preferences.get_time())
+                if preferences.get_latest_ip() != current_ip:
+                    log.warning("IP needs an upgrade - OLD IP: {0} | NEW IP: {1}"
+                                .format(preferences.get_latest_ip(), current_ip))
+                    result = net.set_cloudflare_ip(current_ip)
+                    log.info("IP updated correctly! - Operation return code: {0}".format(result))
+                    log.debug("Updating saved IP...")
+                    preferences.set_latest_ip(current_ip)
+                else:
+                    log.info("IP has not changed - skipping")
+            except (URLError, gaierror) as network_error:
+                log.error("Failure to connect to the network - extended explanation: " + str(network_error))
+            finally:
+                if not preferences.is_running_as_daemon():
+                    log.info("This script is only executed once. Finishing...")
+                    loop_continuation = False
+                else:
+                    log.info("Next check in about {0} minute{1}"
+                             .format((preferences.get_time() / 60),
+                                     's' if (preferences.get_time() / 60) > 1 else ''))
+                    sleep(preferences.get_time())
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
     except Exception as e:
@@ -191,7 +199,7 @@ def parser():
     if preferences.is_record_behind_proxy() != p_args.proxied:
         preferences.record_behind_proxy(p_args.proxied)
         preferences.save_preferences()
-    file_handler = setup_logging("cloudflareLogger", preferences.get_log_file())
+    file_handler = setup_logging("cloudflareLogger", preferences.get_log_file(), level=WARNING)
     fds = [file_handler.stream.fileno()]
     pid_dir = path.dirname(path.abspath(preferences.get_pid_file()))
     if not path.exists(pid_dir):

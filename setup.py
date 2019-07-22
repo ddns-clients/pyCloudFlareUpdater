@@ -25,7 +25,8 @@ setup(
     description='DDNS service for dynamically update CloudFlare \'A\' Records',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    include_package_data=False,
+    package_data={'': ['cloud.png', 'api_keys.png']},
+    include_package_data=True,
     zip_safe=True,
     download_url="https://gitlab.javinator9889.com/ddns-clients/pyCloudFlareUpdater/repository/master/archive.zip",
     entry_points={

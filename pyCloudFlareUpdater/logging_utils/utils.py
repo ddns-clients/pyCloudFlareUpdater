@@ -78,10 +78,6 @@ class LoggingHandler(object):
             for log in self.__logs:
                 log.critical(msg)
 
-        def exception(self, msg, *args, exc_info: bool = True, **kwargs):
-            for log in self.__logs:
-                log.exception(msg, args, exc_info, kwargs)
-
         def get_loggers(self) -> list:
             return self.__logs
 
@@ -115,9 +111,6 @@ class LoggingHandler(object):
 
     def critical(self, msg):
         self.__instance.critical(msg)
-
-    def exception(self, msg, *args, exc_info: bool = True, **kwargs):
-        self.__instance.exception(msg, args, exc_info, kwargs)
 
     def get_loggers(self) -> list:
         return self.__instance.get_loggers()
