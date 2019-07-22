@@ -2,7 +2,7 @@
 
 *DDNS Service for updating dynamically your CloudFlare 'A' Records when your public IP changes*
 
-[![PyPi](https://img.shields.io/badge/v1.0%20-PyPi-green.svg)](https://pypi.org/project/pyCloudFlareUpdater/)
+[![PyPi](https://img.shields.io/badge/v1.1%20-PyPi-green.svg)](https://pypi.org/project/pyCloudFlareUpdater/)
 [![ZIP](https://img.shields.io/badge/Package%20-Zip-green.svg)](https://gitlab.javinator9889.com/ddns-clients/pyCloudFlareUpdater/repository/master/archive.zip)
 [![GIT](https://img.shields.io/badge/Package%20-Git-green.svg)](https://gitlab.javinator9889.com/ddns-clients/pyCloudFlareUpdater.git)
 [![Downloads](https://pepy.tech/badge/pycloudflareupdater)](https://pepy.tech/project/pycloudflareupdater)
@@ -144,4 +144,3 @@ to include the options mentioned above.
      You should have received a copy of the GNU General Public License
     along with this program. If not, see <http://www.gnu.org/licenses/>.
 ```
- 

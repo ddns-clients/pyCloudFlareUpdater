@@ -12,7 +12,7 @@ with open(path.join(this, "README.md"), encoding="utf-8") as f:
 
 setup(
     name='pyCloudFlareUpdater',
-    version='1.1',
+    version='1.10',
     packages=['pyCloudFlareUpdater',
               'pyCloudFlareUpdater.values',
               'pyCloudFlareUpdater.network',
@@ -21,7 +21,7 @@ setup(
     url='https://gitlab.javinator9889.com/ddns-clients/pyCloudFlareUpdater',
     license='GPLv3',
     author='Javinator9889',
-    author_email='javialonso007@hotmail.es',
+    author_email='contact@javinator9889.com',
     description='DDNS service for dynamically update CloudFlare \'A\' Records',
     long_description=long_description,
     long_description_content_type='text/markdown',
