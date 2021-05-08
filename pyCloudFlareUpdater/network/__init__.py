@@ -13,5 +13,4 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
-from ..network.network_utils import Cloudflare
-from ..network.network_utils import get_machine_public_ip
+from .network_utils import Cloudflare, get_machine_public_ip
