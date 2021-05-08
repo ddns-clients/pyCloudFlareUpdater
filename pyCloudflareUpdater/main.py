@@ -23,7 +23,7 @@ from grp import getgrnam
 from .logging_utils import init_logging
 from .preferences import Preferences
 from .network import Cloudflare, get_machine_public_ip
-from .values import DESCRIPTION
+from .values import DESCRIPTION, LOGGER_NAME
 import os
 import daemon
 import daemon.pidfile
@@ -125,7 +125,7 @@ def parser():
                       help="Run the daemon as the specified group.")
     p_args = args.parse_args()
     preferences = Preferences(domain=p_args.domain,
-                              A=p_args.A,
+                              name=p_args.A,
                               update_time=p_args.time,
                               key=p_args.key,
                               mail=p_args.mail,
@@ -133,13 +133,13 @@ def parser():
                               pid_file=p_args.pid_file,
                               log_file=p_args.log_file)
 
-    log = init_logging('cloudflare-logger',
+    log = init_logging(LOGGER_NAME,
                        log_file=preferences.logging_file,
                        file_level=preferences.logging_level)
     fds = []
     for handler in log.handlers:
         if isinstance(handler, RotatingFileHandler):
-            fds += handler.stream.fileno()
+            fds.append(handler.stream.fileno())
 
     uid = getpwnam(p_args.user) if p_args.user is not None else None
     gid = getgrnam(p_args.group) if p_args.group is not None else None
@@ -167,7 +167,7 @@ def parser():
         files_preserve=fds,
         signal_map={
             signal.SIGTERM: handle_sigterm,
-            signal.SIGHUP: 'terminate',
+            signal.SIGHUP: handle_sigterm,
             signal.SIGUSR1: preferences.reload
         },
         uid=uid,

@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/pyCloudFlareUpdater/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudFlareUpdater/__main__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudFlareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudFlareUpdater/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/logging_utils/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/logging_utils/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -69,6 +71,12 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="Errors" />
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
@@ -81,7 +89,7 @@
       <updated>1620411970217</updated>
       <workItem from="1620411973488" duration="977000" />
       <workItem from="1620458029158" duration="14460000" />
-      <workItem from="1620482440604" duration="661000" />
+      <workItem from="1620482440604" duration="2004000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -146,7 +154,21 @@
       <option name="project" value="LOCAL" />
       <updated>1620473569024</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="refactor: moved &quot;old&quot; name to new one">
+      <created>1620483184271</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1620483184271</updated>
+    </task>
+    <task id="LOCAL-00011" summary="refactor: moved &quot;old&quot; name to new one">
+      <created>1620483196388</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1620483196388</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -173,6 +195,7 @@
     <MESSAGE value="preferences: removed old preferences file" />
     <MESSAGE value="main: changed old Cloudflare to new one" />
     <MESSAGE value="requirements: updated install_requires" />
-    <option name="LAST_COMMIT_MESSAGE" value="requirements: updated install_requires" />
+    <MESSAGE value="refactor: moved &quot;old&quot; name to new one" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactor: moved &quot;old&quot; name to new one" />
   </component>
 </project>

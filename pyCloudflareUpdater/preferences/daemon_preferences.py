@@ -34,7 +34,7 @@ class Preferences:
 
     def __init__(self,
                  domain: str = None,
-                 A: str = None,
+                 name: str = None,
                  update_time: int = None,
                  key: str = None,
                  mail: str = None,
@@ -50,7 +50,7 @@ class Preferences:
             uid = os.geteuid()
             log_file = \
                 log_file or "/var/log/cloudflare-ddns.log" if uid == 0 \
-                    else "%s/logs/cloudflare-ddns.log" % home
+                    else "%s/log/cloudflare-ddns.log" % home
             pid_file = \
                 pid_file or "/var/run/cloudflare-ddns.pid" if uid == 0 \
                     else "%s/.cache/cloudflare-ddns.pid" % home
@@ -63,118 +63,106 @@ class Preferences:
             if not os.path.exists(pid_file_dir):
                 os.makedirs(pid_file_dir, mode=0o700, exist_ok=True)
             if 'Logging' not in self.config:
-                self.config['Logging'] = {
-                    'File': log_file,
-                    'Level': logging.getLevelName(log_level)
-                }
+                self.config['Logging'] = {}
             if 'Cloudflare' not in self.config:
-                self.config['Cloudflare'] = {
-                    'Domain': domain,
-                    'A': A,
-                    'FrequencySeconds': update_time,
-                    'APIKey': key,
-                    'Mail': mail,
-                    'Proxy': use_proxy
-                }
+                self.config['Cloudflare'] = {}
             if 'Service' not in self.config:
-                self.config['Service'] = {
-                    'PID': pid_file
-                }
+                self.config['Service'] = {}
 
             cloudflare = self.config['Cloudflare']
             log = self.config['Logging']
             service = self.config['Service']
 
-            self.domain = cloudflare.get('Domain', domain)
-            self.A = cloudflare.get('A', A)
+            self.domain = cloudflare.get('domain', domain)
+            self.name = cloudflare.get('name', name)
             self.frequency = int(
-                cloudflare.get('FrequencySeconds', update_time))
-            self.key = cloudflare.get('APIKey', key)
-            self.mail = cloudflare.get('Mail', mail)
-            self.use_proxy = bool(cloudflare.get('Proxy', str(use_proxy)))
+                cloudflare.get('frequency-minutes', update_time))
+            self.key = cloudflare.get('api-key', key)
+            self.mail = cloudflare.get('mail', mail)
+            self.use_proxy = bool(cloudflare.get('use-proxy', str(use_proxy)))
 
-            self.logging_file = log.get('File', log_file)
+            self.logging_file = log.get('file', log_file)
             self.logging_level = \
-                log.get('Level', logging.getLevelName(log_level))
+                log.get('level', logging.getLevelName(log_level))
 
-            self.pid_file = service.get('PID', pid_file)
+            self.pid_file = service.get('pid-file', pid_file)
 
-            with open(self.file, 'r') as configfile:
+            with open(self.file, 'w') as configfile:
                 self.config.write(configfile)
 
     @property
     def domain(self) -> str:
-        return self.config['Cloudflare']['Domain']
+        return self.config['Cloudflare']['domain']
 
     @domain.setter
     def domain(self, new_domain: str):
         if new_domain is None:
             raise ValueError("Domain must be provided!")
-        self.config['Cloudflare']['Domain'] = new_domain
+        self.config['Cloudflare']['domain'] = new_domain
 
     @property
-    def A(self) -> str:
-        return self.config['Cloudflare']['A']
+    def name(self) -> str:
+        return self.config['Cloudflare']['name']
 
-    @A.setter
-    def A(self, new_A: str):
+    @name.setter
+    def name(self, new_A: str):
         if new_A is None:
             raise ValueError("'A' record must be provided!")
-        self.config['Cloudflare']['A'] = new_A
+        self.config['Cloudflare']['name'] = new_A
 
     @property
     def frequency(self) -> int:
-        return int(self.config['Cloudflare']['FrequencySeconds'])
+        return int(self.config['Cloudflare']['frequency-minutes'])
 
     @frequency.setter
     def frequency(self, new_freq: int):
         if new_freq is None:
             raise ValueError("Update frequency must be provided")
-        self.config['Cloudflare']['FrequencySeconds'] = str(new_freq)
+        self.config['Cloudflare']['frequency-minutes'] = str(new_freq)
 
     @property
     def key(self) -> str:
-        return self.config['Cloudflare']['APIKey']
+        return self.config['Cloudflare']['api-key']
 
     @key.setter
     def key(self, new_key: str):
         if new_key is None:
             raise ValueError("API key must be provided!")
-        self.config['Cloudflare']['APIKey'] = new_key
+        self.config['Cloudflare']['api-key'] = new_key
 
     @property
     def mail(self) -> str:
-        return self.config['Cloudflare']['Mail']
+        return self.config['Cloudflare']['mail']
 
     @mail.setter
     def mail(self, new_mail: str):
         if new_mail is None:
             raise ValueError("Mail must be provided!")
-        self.config['Cloudflare']['Mail'] = new_mail
+        self.config['Cloudflare']['mail'] = new_mail
 
     @property
     def use_proxy(self) -> bool:
-        return bool(self.config['Cloudflare']['Proxy'])
+        return bool(self.config['Cloudflare']['use-proxy'])
 
     @use_proxy.setter
     def use_proxy(self, use: bool):
         if use is None:
             raise ValueError("Whether to use a proxy or not must be specified!")
-        self.config['Cloudflare']['Proxy'] = str(use)
+        self.config['Cloudflare']['use-proxy'] = str(use)
 
     @property
     def logging_file(self) -> str:
-        return self.config['Logging']['File']
+        return self.config['Logging']['file']
 
     @logging_file.setter
     def logging_file(self, file: str):
         if file is None:
             warnings.warn("No data will be logged to any file!")
-        self.config['Logging']['File'] = file
+        self.config['Logging']['file'] = file
 
     @property
     def logging_level(self) -> int:
-        return logging.getLevelName(self.config['Logging']['Level'])
+        return logging.getLevelName(self.config['Logging']['level'])
 
     @logging_level.setter
     def logging_level(self, level: Union[int, str]):
@@ -182,17 +170,17 @@ class Preferences:
             level = logging.getLevelName(level)
         if level not in VALID_LOGGING_LEVELS:
             raise ValueError("Logging level is not valid!")
-        self.config['Logging']['Level'] = logging.getLevelName(level)
+        self.config['Logging']['level'] = logging.getLevelName(level)
 
     @property
     def pid_file(self) -> str:
-        return self.config['Service']['PID']
+        return self.config['Service']['pid-file']
 
     @pid_file.setter
     def pid_file(self, file: str):
         if file is None:
             raise ValueError("PID file must be provided!")
-        self.config['Service']['PID'] = file
+        self.config['Service']['pid-file'] = file
 
     def reload(self):
         self.config.read(self.file)
@@ -200,6 +188,3 @@ class Preferences:
     def save(self):
         with open(self.file, 'w') as configfile:
             self.config.write(configfile)
-
-    def __del__(self):
-        self.save()

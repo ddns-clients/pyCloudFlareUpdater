@@ -46,7 +46,7 @@ def init_logging(logger_name: Optional[str] = None,
     """
     formatter = logging.Formatter(log_format)
     logger = logging.getLogger(logger_name)
-    if logger.created:
+    if getattr(logger, 'created', False):
         return logger
     logger.created = True
     for handler in logger.handlers:

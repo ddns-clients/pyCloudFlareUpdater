@@ -58,13 +58,13 @@ class Cloudflare:
     @property
     def zone(self) -> str:
         path = "zones?name={0}&status=active&page=1&per_page=1&match=all" \
-            .format(self.preferences.A)
+            .format(self.preferences.name)
         return self._do_request(path)[0]['id']
 
     @property
     def identifier(self) -> str:
         path = "zones/{0}/dns_records?type=A&name={1}&page=1&per_page=1" \
-            .format(self.zone, self.preferences.A)
+            .format(self.zone, self.preferences.name)
         return self._do_request(path)[0]['id']
 
     @property
@@ -77,7 +77,7 @@ class Cloudflare:
     def ip(self, new_ip: str):
         data = {
             'type': 'A',
-            'name': self.preferences.A,
+            'name': self.preferences.name,
             'content': new_ip,
             'ttl': 600,
             'proxied': self.preferences.use_proxy
