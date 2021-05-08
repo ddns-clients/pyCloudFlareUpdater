@@ -13,7 +13,12 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
+from .crypt import (
+    save_to_kr, read_from_kr, gen_key, encrypt, decrypt,
+    is_valid_token
+)
 from .. import PRODUCTION_FILE_LOG_LEVEL, VALID_LOGGING_LEVELS
+from cryptography.fernet import InvalidToken
 from configparser import ConfigParser
 from typing import Union
 from pathlib import Path
@@ -46,6 +51,10 @@ class Preferences:
             self.config = ConfigParser()
             self.file = "%s/.config/cloudflare-ddns.ini" % Path.home()
             self.config.read(self.file)
+            self._ck = read_from_kr('cloudflare-key')
+            if self._ck is None:
+                self._ck = gen_key()
+                save_to_kr('cloudflare-key', self._ck)
             home = Path.home()
             uid = os.geteuid()
             log_file = \
@@ -122,12 +131,25 @@ class Preferences:
 
     @property
     def key(self) -> str:
-        return self.config['Cloudflare']['api-key']
+        apikey = self.config['Cloudflare']['api-key']
+        key = read_from_kr('cloudflare-key')
+        if key is None:
+            raise AttributeError('Key was not created! Unexpected failure')
+        try:
+            return decrypt(apikey.encode(), key).decode()
+        except InvalidToken:
+            self.key = apikey
+            return apikey
 
     @key.setter
     def key(self, new_key: str):
         if new_key is None:
             raise ValueError("API key must be provided!")
+        key = read_from_kr('cloudflare-key')
+        if key is None:
+            raise AttributeError('Key was not created! Unexpected failure')
+        if not is_valid_token(new_key.encode(), key):
+            new_key = encrypt(new_key.encode(), key).decode()
         self.config['Cloudflare']['api-key'] = new_key
 
     @property

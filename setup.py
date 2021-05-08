@@ -34,7 +34,10 @@ setup(
     },
     install_requires=['python-daemon>=2,<3',
                       'requests>=2,<3',
-                      'CacheControl>=0.12'],
+                      'CacheControl>=0.12',
+                      'keyring>=23',
+                      'keyrings.cryptfile>=1,<2',
+                      'cryptography>=3'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python',

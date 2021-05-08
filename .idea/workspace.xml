@@ -2,10 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/crypt.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/logging_utils/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/logging_utils/utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -89,7 +91,7 @@
       <updated>1620411970217</updated>
       <workItem from="1620411973488" duration="977000" />
       <workItem from="1620458029158" duration="14460000" />
-      <workItem from="1620482440604" duration="2004000" />
+      <workItem from="1620482440604" duration="5841000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -168,7 +170,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620483196388</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="config: use lowercase variables">
+      <created>1620484823224</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1620484823224</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -196,6 +205,7 @@
     <MESSAGE value="main: changed old Cloudflare to new one" />
     <MESSAGE value="requirements: updated install_requires" />
     <MESSAGE value="refactor: moved &quot;old&quot; name to new one" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactor: moved &quot;old&quot; name to new one" />
+    <MESSAGE value="config: use lowercase variables" />
+    <option name="LAST_COMMIT_MESSAGE" value="config: use lowercase variables" />
   </component>
 </project>
