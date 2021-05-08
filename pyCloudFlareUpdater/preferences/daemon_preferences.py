@@ -194,6 +194,12 @@ class Preferences:
             raise ValueError("PID file must be provided!")
         self.config['Service']['PID'] = file
 
-    def __del__(self):
+    def reload(self):
+        self.config.read(self.file)
+
+    def save(self):
         with open(self.file, 'w') as configfile:
             self.config.write(configfile)
+
+    def __del__(self):
+        self.save()

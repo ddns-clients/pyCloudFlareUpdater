@@ -25,3 +25,5 @@ from .values import (
 )
 
 from .logging_utils import init_logging
+
+from .preferences import Preferences

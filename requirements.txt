@@ -1,2 +1,4 @@
-ujson
-daemonize
+ujson~=4.0.2
+python-daemon~=2.3.0
+setuptools~=56.1.0
+lockfile~=0.12.2
