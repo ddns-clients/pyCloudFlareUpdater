@@ -13,20 +13,18 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
-from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from argparse import ArgumentParser
 from argparse import SUPPRESS
-from atomi
 from logging import Logger
+from pathlib import Path
 from time import sleep
 from pwd import getpwnam
 from grp import getgrnam
 from .logging_utils import init_logging
 from .preferences import Preferences
-from .network import Cloudflare
-from .network import get_machine_public_ip
-from .values import description
+from .network import Cloudflare, get_machine_public_ip
+from .values import DESCRIPTION
 import os
 import daemon
 import lockfile
@@ -39,51 +37,34 @@ def main(preferences: Preferences,
          single_run: bool = False):
     continue_running = True
     try:
-        net = Cloudflare(domain=preferences.domain,
-                         A=preferences.A,
-                         key=preferences.key,
-                         mail=preferences.mail,
-                         proxied=preferences.use_proxy)
+        cloudflare = Cloudflare(preferences)
+        latest_ip = cloudflare.ip
         while continue_running:
             current_ip = get_machine_public_ip()
             log.info("Current machine IP: \"{0}\"".format(current_ip))
-            if preferences.get_latest_ip() == "0.0.0.0":
-                preferences.set_latest_ip(net.get_cloudflare_latest_ip())
-                log.warning(
-                    "User saved latest IP is not up to date - downloading Cloudflare A Record value: \"{0}\""
-                        .format(preferences.get_latest_ip()))
-            if preferences.get_latest_ip() != current_ip:
-                log.info("IP needs an upgrade - OLD IP: {0} | NEW IP: {1}"
-                         .format(preferences.get_latest_ip(), current_ip))
-                result = net.set_cloudflare_ip(current_ip)
-                log.info(
-                    "IP updated correctly! - Operation return code: {0}".format(
-                        result))
-                log.debug("Updating saved IP...")
-                preferences.set_latest_ip(current_ip)
-            else:
-                log.info("IP has not changed - skipping")
-            if not preferences.is_running_as_daemon():
-                log.info("This script is only executed once. Finishing...")
-                loop_continuation = False
-            else:
-                log.info("Next check in about {0} minute{1}"
-                         .format((preferences.get_time() / 60),
-                                 's' if (
-                                                preferences.get_time() / 60) > 1 else ''))
-                sleep(preferences.get_time())
+            if current_ip != latest_ip:
+                log.warning('IP changed! Old one was: %s. Substituting with %s',
+                            latest_ip, current_ip)
+                cloudflare.ip = current_ip
+                latest_ip = current_ip
+            if single_run:
+                log.info('User requested single run. Exiting...')
+                continue_running = False
+                continue
+
+            sleep(preferences.frequency)
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
     except Exception as e:
         log.error("Exception registered! - " + str(e))
         log.error("Stacktrace: " + traceback.format_exc())
     finally:
-        preferences.save_preferences()
+        preferences.save()
         exit(0)
 
 
 def parser():
-    args = ArgumentParser(description=description,
+    args = ArgumentParser(description=DESCRIPTION,
                           allow_abbrev=False)
     args.add_argument("--domain",
                       type=str,
