@@ -1,4 +1,4 @@
-#                             pyCloudFlareUpdater
+#                             pyCloudflareUpdater
 #                  Copyright (C) 2019 - Javinator9889
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -16,7 +16,7 @@
 from logging import DEBUG, INFO, WARNING
 import logging
 
-DESCRIPTION = """pyCloudFlareUpdater\n\n
+DESCRIPTION = """pyCloudflareUpdater\n\n
 The first time this application is executed, all params must be included in order to save the user preferences 
 and do this process automatically."""
 CLOUDFLARE_BASE_URL = "https://api.cloudflare.com/client/v4/{0}"

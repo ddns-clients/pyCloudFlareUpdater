@@ -1,4 +1,4 @@
-#                             pyCloudFlareUpdater
+#                             pyCloudflareUpdater
 #                  Copyright (C) 2019 - Javinator9889
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -13,8 +13,19 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
-import main
+from .values import (
+    LOGGER_NAME,
+    LOG_FILE,
+    LOG_DEFAULT_FORMAT,
+    DEV_CONSOLE_LOG_LEVEL,
+    PRODUCTION_CONSOLE_LOG_LEVEL,
+    DEV_FILE_LOG_LEVEL,
+    PRODUCTION_FILE_LOG_LEVEL,
+    VALID_LOGGING_LEVELS,
+    CLOUDFLARE_BASE_URL,
+    DESCRIPTION
+)
 
+from .logging_utils import init_logging
 
-if __name__ == '__main__':
-    main.parser()
+from .preferences import Preferences

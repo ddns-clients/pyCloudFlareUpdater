@@ -11,13 +11,13 @@ with open(path.join(this, "README.md"), encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
-    name='pyCloudFlareUpdater',
+    name='pyCloudflareUpdater',
     version='2.0.0',
-    packages=['pyCloudFlareUpdater',
-              'pyCloudFlareUpdater.values',
-              'pyCloudFlareUpdater.network',
-              'pyCloudFlareUpdater.preferences',
-              'pyCloudFlareUpdater.logging_utils'],
+    packages=['pyCloudflareUpdater',
+              'pyCloudflareUpdater.values',
+              'pyCloudflareUpdater.network',
+              'pyCloudflareUpdater.preferences',
+              'pyCloudflareUpdater.logging_utils'],
     url='https://github.com/ddns-clients/pyCloudFlareUpdater',
     license='GPLv3',
     author='Javinator9889',
@@ -30,7 +30,7 @@ setup(
     download_url="https://github.com/ddns-clients/pyCloudFlareUpdater/archive/refs/heads/master.zip",
     entry_points={
         'console_scripts': [
-            'cloudflare-ddns=pyCloudFlareUpdater.main:parser']
+            'cloudflare-ddns=pyCloudflareUpdater.main:parser']
     },
     install_requires=['python-daemon>=2,<3',
                       'requests>=2,<3',

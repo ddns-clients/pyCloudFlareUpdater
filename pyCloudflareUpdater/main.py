@@ -15,7 +15,6 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 from logging.handlers import RotatingFileHandler
 from argparse import ArgumentParser
-from argparse import SUPPRESS
 from logging import Logger
 from pathlib import Path
 from time import sleep
@@ -64,13 +63,15 @@ def main(preferences: Preferences,
 
 
 def parser():
-    args = ArgumentParser(description=DESCRIPTION,
+    args = ArgumentParser(prog='cloudflare-ddns',
+                          description=DESCRIPTION,
                           allow_abbrev=False)
     args.add_argument("--domain",
                       type=str,
                       default=None,
                       help="Cloudflare domain to be updated.")
     args.add_argument("--A",
+                      metavar='A-RECORD',
                       type=str,
                       default=None,
                       help="Cloudflare 'A' Record name.")
@@ -82,6 +83,7 @@ def parser():
     args.add_argument("--key",
                       type=str,
                       default=None,
+                      metavar='API-KEY',
                       help="Cloudflare API key.")
     args.add_argument("--mail",
                       type=str,
@@ -99,16 +101,16 @@ def parser():
                       help="By default, the program runs as a daemon in "
                            "background. With this option enabled, "
                            "the program will run only once and then exit.")
-    args.add_argument("--pidfile",
+    args.add_argument("--pid-file",
                       type=str,
-                      default=SUPPRESS,
-                      metavar="PID FILE",
+                      default=None,
+                      metavar="LOCATION",
                       help="Specifies a custom PID file for storing current "
                            "daemon PID.")
-    args.add_argument("--logfile",
+    args.add_argument("--log-file",
                       type=str,
-                      default=SUPPRESS,
-                      metavar="LOG FILE",
+                      default=None,
+                      metavar="LOCATION",
                       help="Specifies a custom LOG file for storing current "
                            "daemon logs.")
     args.add_argument("--user",
@@ -119,7 +121,7 @@ def parser():
     args.add_argument("--group",
                       type=str,
                       default=None,
-                      metavar="GROUP NAME",
+                      metavar="GROUP-NAME",
                       help="Run the daemon as the specified group.")
     p_args = args.parse_args()
     preferences = Preferences(domain=p_args.domain,
@@ -128,7 +130,7 @@ def parser():
                               key=p_args.key,
                               mail=p_args.mail,
                               use_proxy=p_args.proxied,
-                              pid_file=p_args.pidfile,
+                              pid_file=p_args.pid_file,
                               log_file=p_args.log_file)
 
     log = init_logging('cloudflare-logger',

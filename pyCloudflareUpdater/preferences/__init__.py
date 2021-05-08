@@ -1,4 +1,4 @@
-#                             pyCloudFlareUpdater
+#                             pyCloudflareUpdater
 #                  Copyright (C) 2019 - Javinator9889
 #
 #    This program is free software: you can redistribute it and/or modify
@@ -13,4 +13,4 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
-from .network_utils import Cloudflare, get_machine_public_ip
+from .daemon_preferences import Preferences
