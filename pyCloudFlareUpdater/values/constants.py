@@ -14,6 +14,7 @@
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 from logging import DEBUG, INFO, WARNING
+import logging
 
 description = """pyCloudFlareUpdater\n\n
 The first time this application is executed, all params must be included in order to save the user preferences 
@@ -30,3 +31,7 @@ PRODUCTION_FILE_LOG_LEVEL = WARNING
 
 DEV_CONSOLE_LOG_LEVEL = DEBUG
 DEV_FILE_LOG_LEVEL = DEBUG
+
+VALID_LOGGING_LEVELS = {logging.DEBUG, logging.WARN, logging.INFO,
+                        logging.CRITICAL, logging.ERROR, logging.FATAL,
+                        logging.NOTSET}

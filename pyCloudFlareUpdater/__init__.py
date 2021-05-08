@@ -20,7 +20,8 @@ from .values import (
     DEV_CONSOLE_LOG_LEVEL,
     PRODUCTION_CONSOLE_LOG_LEVEL,
     DEV_FILE_LOG_LEVEL,
-    PRODUCTION_FILE_LOG_LEVEL
+    PRODUCTION_FILE_LOG_LEVEL,
+    VALID_LOGGING_LEVELS
 )
 
 from .logging_utils import init_logging
