@@ -18,11 +18,11 @@ setup(
               'pyCloudFlareUpdater.network',
               'pyCloudFlareUpdater.preferences',
               'pyCloudFlareUpdater.logging_utils'],
-    url='https://gitlab.javinator9889.com/ddns-clients/pyCloudFlareUpdater',
+    url='https://github.com/ddns-clients/pyCloudFlareUpdater',
     license='GPLv3',
     author='Javinator9889',
     author_email='contact@javinator9889.com',
-    description='DDNS service for dynamically update CloudFlare \'A\' Records',
+    description='DDNS service for dynamically update Cloudflare \'A\' Records',
     long_description=long_description,
     long_description_content_type='text/markdown',
     include_package_data=False,
@@ -30,9 +30,11 @@ setup(
     download_url="https://github.com/ddns-clients/pyCloudFlareUpdater/archive/refs/heads/master.zip",
     entry_points={
         'console_scripts': [
-            'cloudflare_ddns=pyCloudFlareUpdater.__main__:parser']
+            'cloudflare-ddns=pyCloudFlareUpdater.main:parser']
     },
-    install_requires=['daemonize'],
+    install_requires=['python-daemon>=2,<3',
+                      'requests>=2,<3',
+                      'CacheControl>=0.12'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python',
@@ -41,12 +43,10 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.1',
-        'Programming Language :: Python :: 3.2',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ]
 )

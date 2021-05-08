@@ -1,6 +1,5 @@
 ujson~=4.0.2
 python-daemon~=2.3.0
 setuptools~=56.1.0
-lockfile~=0.12.2
 requests~=2.25.1
 CacheControl~=0.12.6

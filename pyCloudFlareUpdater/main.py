@@ -27,7 +27,7 @@ from .network import Cloudflare, get_machine_public_ip
 from .values import DESCRIPTION
 import os
 import daemon
-import lockfile
+import daemon.pidfile
 import signal
 import traceback
 
@@ -142,7 +142,7 @@ def parser():
     uid = getpwnam(p_args.user) if p_args.user is not None else None
     gid = getgrnam(p_args.group) if p_args.group is not None else None
 
-    pid_file = lockfile.LockFile(preferences.pid_file)
+    pid_file = daemon.pidfile.PIDLockFile(preferences.pid_file)
 
     def handle_sigterm():
         try:
