@@ -13,111 +13,80 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
+import os
 import logging
 
-
-def cleanup_old_logs(log_file: str):
-    import tarfile
-    import os
-
-    tar_log_filename = log_file + ".tar.gz"
-
-    if os.path.exists(log_file):
-        if os.path.exists(tar_log_filename):
-            os.remove(tar_log_filename)
-        with tarfile.open(tar_log_filename, "w:gz") as tar:
-            tar.add(log_file, arcname=os.path.basename(log_file))
-            tar.close()
-            os.remove(log_file)
+from logging.handlers import RotatingFileHandler
+from typing import Optional
+from .. import (
+    LOG_FILE,
+    LOG_DEFAULT_FORMAT,
+    DEV_CONSOLE_LOG_LEVEL,
+    DEV_FILE_LOG_LEVEL
+)
 
 
-def setup_logging(logger_name: str, log_file: str, level=logging.DEBUG,
-                  formatter: str = "%(process)d - %(asctime)s | [%(levelname)s]: %(message)s"):
-    from os import path
-    from os import makedirs
+def init_logging(logger_name: Optional[str] = None,
+                 log_file: Optional[str] = LOG_FILE,
+                 console_level: int = DEV_CONSOLE_LOG_LEVEL,
+                 file_level: int = DEV_FILE_LOG_LEVEL,
+                 log_format: str = LOG_DEFAULT_FORMAT) -> logging:
+    """
+    Creates a custom logging that outputs to both console and file, if
+    filename provided. Automatically cleans-up old logs during runtime and
+    allows customization of both console and file levels in addition to the
+    formatter.
+    :param logger_name: the logger name for later obtaining it.
+    :param log_file: a filename for saving the logs during execution - can be
+                    `None`
+    :param console_level: the logging level for console.
+    :param file_level: the logging level for the file.
+    :param log_format: the logging format.
+    :return: the created logging instance
+    """
+    formatter = logging.Formatter(log_format)
+    logger = logging.getLogger(logger_name)
+    if logger.created:
+        return logger
+    logger.created = True
+    for handler in logger.handlers:
+        if type(handler) is logging.StreamHandler:
+            handler.setLevel(console_level)
+            handler.formatter = formatter
 
-    log_dir = path.dirname(path.abspath(log_file))
-    if not path.exists(log_dir):
-        makedirs(log_dir)
+    def file_rotator(source: str, dest: str):
+        """
+        Custom file rotator for creating compressed logging files.
+        :param source: source filename.
+        :param dest: destination filename.
+        """
+        import gzip
+        import shutil
 
-    cleanup_old_logs(log_file)
-    new_logging = logging.getLogger(logger_name)
-    logging_formatter = logging.Formatter(formatter)
-    logging_file_handler = logging.FileHandler(log_file, mode="w")
+        with open(source, "rb") as in_file:
+            with gzip.open(dest, "wb") as out_file:
+                shutil.copyfileobj(in_file, out_file)
 
-    logging_file_handler.setFormatter(logging_formatter)
+    def namer(name: str) -> str:
+        """
+        Custom namer implementation as we are gzipping files.
+        :param name: the name to append .gz
+        :return: the name with .gz extension
+        """
+        return f"{name}.gz"
 
-    new_logging.setLevel(level)
-    new_logging.addHandler(logging_file_handler)
+    if log_file:
+        old_log = os.path.exists(log_file)
+        file_handler = RotatingFileHandler(log_file,
+                                           mode='a',
+                                           maxBytes=2 << 20,
+                                           backupCount=5)
+        file_handler.rotator = file_rotator
+        file_handler.namer = namer
+        file_handler.setLevel(file_level)
+        file_handler.formatter = formatter
+        if old_log:
+            file_handler.doRollover()
+        logger.addHandler(file_handler)
 
-    return logging_file_handler
-
-
-class LoggingHandler(object):
-    class __LoggingHandler(object):
-        def __init__(self, logs: list):
-            self.__logs = logs
-
-        def debug(self, msg):
-            for log in self.__logs:
-                log.debug(msg)
-
-        def info(self, msg):
-            for log in self.__logs:
-                log.info(msg)
-
-        def error(self, msg):
-            for log in self.__logs:
-                log.error(msg)
-
-        def warning(self, msg):
-            for log in self.__logs:
-                log.warning(msg)
-
-        def critical(self, msg):
-            for log in self.__logs:
-                log.critical(msg)
-
-        def exception(self, msg, *args, exc_info: bool = True, **kwargs):
-            for log in self.__logs:
-                log.exception(msg, args, exc_info, kwargs)
-
-        def get_loggers(self) -> list:
-            return self.__logs
-
-    __instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not LoggingHandler.__instance:
-            logs = kwargs.get("logs")
-            if not logs or len(logs) == 0:
-                raise AttributeError("At least kwarg \"log\" (a list of the loggers) must be provided")
-            LoggingHandler.__instance = LoggingHandler.__LoggingHandler(logs)
-        return LoggingHandler.__instance
-
-    def __getattr__(self, item):
-        return getattr(self.__instance, item)
-
-    def __setattr__(self, key, value):
-        return setattr(self.__instance, key, value)
-
-    def debug(self, msg):
-        self.__instance.debug(msg)
-
-    def info(self, msg):
-        self.__instance.info(msg)
-
-    def error(self, msg):
-        self.__instance.error(msg)
-
-    def warning(self, msg):
-        self.__instance.warning(msg)
-
-    def critical(self, msg):
-        self.__instance.critical(msg)
-
-    def exception(self, msg, *args, exc_info: bool = True, **kwargs):
-        self.__instance.exception(msg, args, exc_info, kwargs)
-
-    def get_loggers(self) -> list:
-        return self.__instance.get_loggers()
+    return logger

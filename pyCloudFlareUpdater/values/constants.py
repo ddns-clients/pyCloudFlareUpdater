@@ -13,7 +13,20 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
+from logging import DEBUG, INFO, WARNING
+
 description = """pyCloudFlareUpdater\n\n
 The first time this application is executed, all params must be included in order to save the user preferences 
 and do this process automatically."""
 cloudflare_base_url = "https://api.cloudflare.com/client/v4/{0}"
+
+# Logging constants
+LOGGER_NAME = "cloudflare:logger"
+LOG_FILE = "cloudflare-ddns.log"
+LOG_DEFAULT_FORMAT = \
+    "%(process)d[%(thread)d] - %(asctime)s | [%(levelname)s]: %(message)s"
+PRODUCTION_CONSOLE_LOG_LEVEL = INFO
+PRODUCTION_FILE_LOG_LEVEL = WARNING
+
+DEV_CONSOLE_LOG_LEVEL = DEBUG
+DEV_FILE_LOG_LEVEL = DEBUG

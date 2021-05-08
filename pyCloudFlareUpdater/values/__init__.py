@@ -13,5 +13,12 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
-from ..values.constants import cloudflare_base_url
-from ..values.constants import description
+from .constants import (
+    LOGGER_NAME,
+    LOG_FILE,
+    LOG_DEFAULT_FORMAT,
+    PRODUCTION_FILE_LOG_LEVEL,
+    PRODUCTION_CONSOLE_LOG_LEVEL,
+    DEV_FILE_LOG_LEVEL,
+    DEV_CONSOLE_LOG_LEVEL
+)
