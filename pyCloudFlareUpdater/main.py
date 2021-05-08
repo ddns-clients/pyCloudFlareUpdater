@@ -17,7 +17,8 @@ from pathlib import Path
 from logging.handlers import RotatingFileHandler
 from argparse import ArgumentParser
 from argparse import SUPPRESS
-from logging import getLogger
+from atomi
+from logging import Logger
 from time import sleep
 from pwd import getpwnam
 from grp import getgrnam
@@ -33,16 +34,17 @@ import signal
 import traceback
 
 
-def main(preferences: Preferences):
-    log = LoggingHandler(logs=[getLogger("cloudflareLogger")])
-    loop_continuation = True
+def main(preferences: Preferences,
+         log: Logger,
+         single_run: bool = False):
+    continue_running = True
     try:
-        net = Cloudflare(domain=preferences.get_domain(),
-                         name=preferences.get_name(),
-                         key=preferences.get_key(),
-                         mail=preferences.get_mail(),
-                         proxied=preferences.is_record_behind_proxy())
-        while loop_continuation:
+        net = Cloudflare(domain=preferences.domain,
+                         A=preferences.A,
+                         key=preferences.key,
+                         mail=preferences.mail,
+                         proxied=preferences.use_proxy)
+        while continue_running:
             current_ip = get_machine_public_ip()
             log.info("Current machine IP: \"{0}\"".format(current_ip))
             if preferences.get_latest_ip() == "0.0.0.0":
@@ -172,7 +174,7 @@ def parser():
                 handler.close()
             exit(0)
         except Exception as e:
-            log.fatal('Unable to finish correctly! - %s', e, exc_info=True)
+            log.fatal('Unable to finish correctly! - %s', str(e), exc_info=True)
             exit(1)
 
     context = daemon.DaemonContext(
@@ -190,4 +192,4 @@ def parser():
     )
 
     with context:
-        main(preferences)
+        main(preferences, log, single_run=p_args.no_daemonize)

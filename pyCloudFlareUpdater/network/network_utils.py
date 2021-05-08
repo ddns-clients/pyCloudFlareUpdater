@@ -13,85 +13,75 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
+try:
+    import ujson as json
+except ImportError:
+    import json
+import requests
+from cachecontrol import CacheControlAdapter
+from ..preferences import Preferences
+from ..values import CLOUDFLARE_BASE_URL
 
 
 def get_machine_public_ip():
-    import urllib.request
-
-    return urllib.request.urlopen('https://ident.me').read().decode('utf8')
+    return requests.get('https://ident.me').text
 
 
-class CloudFlare(object):
-    def __init__(self, domain, name, key, mail, proxied):
-        self.__domain = domain
-        self.__name = name
-        self.__headers = {"X-Auth-Email": mail,
-                          "X-Auth-Key": key,
-                          "Content-Type": "application/json"}
-        self.__proxied = proxied
-        self.__zone = self._get_zone()
-        self.__id = self._get_identifier()
+class Cloudflare:
+    def __init__(self, preferences: Preferences):
+        self.preferences = preferences
+        self.session = requests.Session()
+        self.session.mount('https://', CacheControlAdapter())
+        self.session.headers.update(self._construct_headers())
 
-    def _get_zone(self):
-        try:
-            import ujson as json
-        except ImportError:
-            import json
-        from urllib.request import Request, urlopen
+    def _construct_headers(self) -> dict:
+        return {
+            'X-Auth-Email': self.preferences.mail,
+            'X-Auth-Key': self.preferences.key,
+            'Content-Type': 'application/json'
+        }
 
-        from ..values import cloudflare_base_url
+    def _do_request(self, path: str, method: str = 'GET', data=None) -> json:
+        tmp_headers = self._construct_headers()
+        if self.session.headers != tmp_headers:
+            self.session.headers.update(tmp_headers)
+        req = self.session.request(method,
+                                   CLOUDFLARE_BASE_URL.format(path),
+                                   data=data)
+        req.encoding = 'utf-8'
+        res = json.loads(req.text)
+        if req.status_code >= 304 or not res['success']:
+            raise requests.HTTPError("Cloudflare GET failure - error: %s"
+                                     % res['errors'][0])
+        return res['result']
 
-        url_extra_attrs = "zones?name={0}&status=active&page=1&per_page=1&match=all".format(self.__name)
-        request = Request(cloudflare_base_url.format(url_extra_attrs), headers=self.__headers)
-        result = json.loads(urlopen(request).read().decode("utf8"))
-        if not result["success"]:
-            raise ValueError("CloudFlare returned error code with the request data - more info: " + result["errors"][0])
+    @property
+    def zone(self) -> str:
+        path = "zones?name={0}&status=active&page=1&per_page=1&match=all" \
+            .format(self.preferences.A)
+        return self._do_request(path)[0]['id']
 
-        return result["result"][0]["id"]
+    @property
+    def identifier(self) -> str:
+        path = "zones/{0}/dns_records?type=A&name={1}&page=1&per_page=1" \
+            .format(self.zone, self.preferences.A)
+        return self._do_request(path)[0]['id']
 
-    def _get_identifier(self):
-        try:
-            import ujson as json
-        except ImportError:
-            import json
-        from urllib.request import Request, urlopen
+    @property
+    def ip(self) -> str:
+        path = "zones/{0}/dns_records/{1}".format(self.zone,
+                                                  self.identifier)
+        return self._do_request(path)['content']
 
-        from ..values import cloudflare_base_url
-
-        url_extra_attrs = "zones/{0}/dns_records?type=A&name={1}&page=1&per_page=1".format(self.__zone, self.__name)
-        request = Request(cloudflare_base_url.format(url_extra_attrs), headers=self.__headers)
-        result = json.loads(urlopen(request).read().decode("utf8"))
-        if not result["success"]:
-            raise ValueError("CloudFlare returned error code with the request data - more info: " + result["errors"][0])
-
-        return result["result"][0]["id"]
-
-    def get_cloudflare_latest_ip(self):
-        try:
-            import ujson as json
-        except ImportError:
-            import json
-        from urllib.request import Request, urlopen
-        from ..values import cloudflare_base_url
-
-        url_extra_attrs = "zones/{0}/dns_records/{1}".format(self.__zone, self.__id)
-        request = Request(cloudflare_base_url.format(url_extra_attrs), headers=self.__headers)
-        result = json.loads(urlopen(request).read().decode("utf8"))
-
-        return result["result"]["content"]
-
-    def set_cloudflare_ip(self, ip):
-        try:
-            from ujson import dumps
-        except ImportError:
-            from json import dumps
-        from urllib.request import Request, urlopen
-        from ..values import cloudflare_base_url
-
-        data = dumps({"type": "A", "name": self.__name, "content": ip, "ttl": 600, "proxied": self.__proxied})
-        url_extra_attrs = "zones/{0}/dns_records/{1}".format(self.__zone, self.__id)
-        request = Request(url=cloudflare_base_url.format(url_extra_attrs),
-                          data=data.encode("utf-8"),
-                          headers=self.__headers,
-                          method="PUT")
-        return urlopen(request).getcode()
+    @ip.setter
+    def ip(self, new_ip: str):
+        data = {
+            'type': 'A',
+            'name': self.preferences.A,
+            'content': new_ip,
+            'ttl': 600,
+            'proxied': self.preferences.use_proxy
+        }
+        path = "zones/{0}/dns_records/{1}".format(self.zone,
+                                                  self.identifier)
+        self._do_request(path, method='POST', data=data)

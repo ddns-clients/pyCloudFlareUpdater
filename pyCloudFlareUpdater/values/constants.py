@@ -16,10 +16,10 @@
 from logging import DEBUG, INFO, WARNING
 import logging
 
-description = """pyCloudFlareUpdater\n\n
+DESCRIPTION = """pyCloudFlareUpdater\n\n
 The first time this application is executed, all params must be included in order to save the user preferences 
 and do this process automatically."""
-cloudflare_base_url = "https://api.cloudflare.com/client/v4/{0}"
+CLOUDFLARE_BASE_URL = "https://api.cloudflare.com/client/v4/{0}"
 
 # Logging constants
 LOGGER_NAME = "cloudflare:logger"
