@@ -18,20 +18,23 @@ from .crypt import (
     is_valid_token
 )
 from .. import (
-    PRODUCTION_FILE_LOG_LEVEL, VALID_LOGGING_LEVELS,
+    PRODUCTION_FILE_LOG_LEVEL, VALID_LOGGING_LEVELS, DEFAULT_SETTINGS,
     ensure_permissions, change_permissions
 )
 from cryptography.fernet import InvalidToken
-from configparser import ConfigParser
+# from configparser import ConfigParser
+from configupdater import ConfigUpdater
 from typing import Union
 from pathlib import Path
-import warnings
-import logging
 import os
+import logging
+import warnings
 
 
 class Preferences:
     __instance__ = None
+
+    file = "%s/.config/cloudflare-ddns.ini" % Path.home()
 
     def __new__(cls, *args, **kwargs):
         if Preferences.__instance__ is None:
@@ -51,8 +54,9 @@ class Preferences:
                  log_file: str = None,
                  log_level: int = PRODUCTION_FILE_LOG_LEVEL):
         if self.__must_init:
-            self.config = ConfigParser()
-            self.file = "%s/.config/cloudflare-ddns.ini" % Path.home()
+            self.config = ConfigUpdater(allow_no_value=True)
+            if not os.path.exists(self.file):
+                self.create_empty_file()
             self.config.read(self.file)
             self._ck = read_from_kr('cloudflare-key')
             if self._ck is None:
@@ -220,3 +224,16 @@ class Preferences:
         self._check_perms()
         with open(self.file, 'w') as configfile:
             self.config.write(configfile)
+
+    @staticmethod
+    def create_empty_file():
+        if not os.path.exists(Preferences.file):
+            config_dir = os.path.dirname(Preferences.file)
+            if not os.path.exists(config_dir):
+                os.makedirs(config_dir, mode=0o700, exist_ok=True)
+
+            with open(Preferences.file, 'w') as configfile:
+                configfile.write(DEFAULT_SETTINGS)
+
+            if not ensure_permissions(Preferences.file, 0o700):
+                change_permissions(Preferences.file, 0o700)
