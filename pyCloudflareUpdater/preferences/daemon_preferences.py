@@ -17,7 +17,10 @@ from .crypt import (
     save_to_kr, read_from_kr, gen_key, encrypt, decrypt,
     is_valid_token
 )
-from .. import PRODUCTION_FILE_LOG_LEVEL, VALID_LOGGING_LEVELS
+from .. import (
+    PRODUCTION_FILE_LOG_LEVEL, VALID_LOGGING_LEVELS,
+    ensure_permissions, change_permissions
+)
 from cryptography.fernet import InvalidToken
 from configparser import ConfigParser
 from typing import Union
@@ -98,6 +101,11 @@ class Preferences:
 
             with open(self.file, 'w') as configfile:
                 self.config.write(configfile)
+
+    def _check_perms(self):
+        if not ensure_permissions(self.file, 0o700):
+            warnings.warn("Insecure permissions detected! Changing...")
+            change_permissions(self.file, 0o700)
 
     @property
     def domain(self) -> str:
@@ -205,8 +213,10 @@ class Preferences:
         self.config['Service']['pid-file'] = file
 
     def reload(self):
+        self._check_perms()
         self.config.read(self.file)
 
     def save(self):
+        self._check_perms()
         with open(self.file, 'w') as configfile:
             self.config.write(configfile)

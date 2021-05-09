@@ -20,7 +20,7 @@ except ImportError:
 import requests
 from cachecontrol import CacheControlAdapter
 from ..preferences import Preferences
-from ..values import CLOUDFLARE_BASE_URL
+from ..utils import CLOUDFLARE_BASE_URL
 
 
 def get_machine_public_ip():

@@ -23,7 +23,7 @@ from grp import getgrnam
 from .logging_utils import init_logging
 from .preferences import Preferences
 from .network import Cloudflare, get_machine_public_ip
-from .values import DESCRIPTION, LOGGER_NAME
+from .utils import DESCRIPTION, LOGGER_NAME
 import os
 import daemon
 import daemon.pidfile

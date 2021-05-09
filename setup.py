@@ -14,7 +14,7 @@ setup(
     name='pyCloudflareUpdater',
     version='2.0.0',
     packages=['pyCloudflareUpdater',
-              'pyCloudflareUpdater.values',
+              'pyCloudflareUpdater.utils',
               'pyCloudflareUpdater.network',
               'pyCloudflareUpdater.preferences',
               'pyCloudflareUpdater.logging_utils'],
