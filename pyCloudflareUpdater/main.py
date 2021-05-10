@@ -23,43 +23,58 @@ from grp import getgrnam
 from .logging_utils import init_logging
 from .preferences import Preferences
 from .network import Cloudflare, get_machine_public_ip
-from .utils import DESCRIPTION, LOGGER_NAME
+from .utils import DESCRIPTION, LOGGER_NAME, PROJECT_URL, DEVELOPER_MAIL
 import os
 import daemon
 import daemon.pidfile
+import socket
 import signal
 import traceback
+import requests
 
 
 def main(preferences: Preferences,
          log: Logger,
          single_run: bool = False):
     continue_running = True
+    exit_code = 0
     try:
         cloudflare = Cloudflare(preferences)
         latest_ip = cloudflare.ip
         while continue_running:
-            current_ip = get_machine_public_ip()
-            log.info("Current machine IP: \"{0}\"".format(current_ip))
-            if current_ip != latest_ip:
-                log.warning('IP changed! Old one was: %s. Substituting with %s',
-                            latest_ip, current_ip)
-                cloudflare.ip = current_ip
-                latest_ip = current_ip
-            if single_run:
-                log.info('User requested single run. Exiting...')
-                continue_running = False
-                continue
+            try:
+                current_ip = get_machine_public_ip()
+                log.info("Current machine IP: \"{0}\"".format(current_ip))
+                if current_ip != latest_ip:
+                    log.warning(f'IP changed! {latest_ip} -> {current_ip}')
+                    cloudflare.ip = current_ip
+                    latest_ip = current_ip
+                if single_run:
+                    log.info('User requested single run. Exiting...')
+                    continue_running = False
+                    continue
 
-            sleep(preferences.frequency)
+            except socket.gaierror:
+                log.warning('DNS name resolution failure! Check settings')
+            except requests.exceptions.HTTPError as httperr:
+                log.critical('HTTP error when accessing '
+                             f'{httperr.request}!\n{httperr}')
+            finally:
+                sleep(preferences.frequency)
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
+        exit_code = 130
     except Exception as e:
-        log.error("Exception registered! - " + str(e))
-        log.error("Stacktrace: " + traceback.format_exc())
+        log.error(f'Unexpected exception registered! "{str(e)}"')
+        log.error(f'Please, submit the following traceback at {PROJECT_URL} '
+                  f'or email it at {DEVELOPER_MAIL}')
+        log.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Stacktrace:\n"
+                  f"{traceback.format_exc()}\n"
+                  "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        exit_code = 1
     finally:
         preferences.save()
-        exit(0)
+        exit(exit_code)
 
 
 def parser():
@@ -111,7 +126,7 @@ def parser():
                            "exits.")
     args.add_argument("--config-file",
                       type=str,
-                      default="%s/.config/cloudflare-ddns.ini" % Path.home(),
+                      default=f"{Path.home()}/.config/cloudflare-ddns.ini",
                       metavar="PATH",
                       help="Defines the daemon's config file location. "
                            "Defaults to: \"~/.config/cloudflare-ddns.ini\"")
@@ -142,7 +157,7 @@ def parser():
         Preferences.file = p_args.config_file
         if p_args.init_config:
             if Preferences.create_empty_file():
-                print('Created configuration file at "%s"' % Preferences.file)
+                print(f'Created configuration file at "{Preferences.file}"')
                 exit(0)
             else:
                 print('File already exists! Not doing anything...')
@@ -180,8 +195,7 @@ def parser():
                     handler.close()
                 exit(0)
             except Exception as e:
-                log.fatal('Unable to finish correctly! - %s',
-                          str(e),
+                log.fatal(f'Unable to finish correctly! - {e}',
                           exc_info=True)
                 exit(1)
 

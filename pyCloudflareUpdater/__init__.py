@@ -24,7 +24,9 @@ from .utils import (
     VALID_LOGGING_LEVELS,
     CLOUDFLARE_BASE_URL,
     DESCRIPTION,
-    DEFAULT_SETTINGS
+    DEFAULT_SETTINGS,
+    PROJECT_URL,
+    DEVELOPER_MAIL
 )
 
 from .utils import (

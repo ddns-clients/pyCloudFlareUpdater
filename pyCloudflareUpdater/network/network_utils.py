@@ -24,7 +24,7 @@ from ..utils import CLOUDFLARE_BASE_URL
 
 
 def get_machine_public_ip():
-    return requests.get('https://ident.me').text
+    return requests.get('https://ident.me/').text
 
 
 class Cloudflare:
@@ -45,14 +45,19 @@ class Cloudflare:
         tmp_headers = self._construct_headers()
         if self.session.headers != tmp_headers:
             self.session.headers.update(tmp_headers)
-        req = self.session.request(method,
-                                   CLOUDFLARE_BASE_URL.format(path),
-                                   data=data)
+        url = CLOUDFLARE_BASE_URL.format(path)
+        req = self.session.request(method, url, data=data)
         req.encoding = 'utf-8'
         res = json.loads(req.text)
+
         if req.status_code >= 304 or not res['success']:
-            raise requests.HTTPError("Cloudflare GET failure - error: %s"
-                                     % res['errors'][0])
+            error_json = res['errors'][0]
+            error_msg = [f"({error_json['code']}) {error_json['message']}"]
+            for error in error_json['error_chain']:
+                error_msg.append(f"\t- ({error['code']}) {error['message']}")
+            raise requests.HTTPError('\n'.join(error_msg),
+                                     request=url,
+                                     response=error_json)
         return res['result']
 
     @property

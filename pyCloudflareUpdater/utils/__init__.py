@@ -24,7 +24,9 @@ from .constants import (
     VALID_LOGGING_LEVELS,
     CLOUDFLARE_BASE_URL,
     DESCRIPTION,
-    DEFAULT_SETTINGS
+    DEFAULT_SETTINGS,
+    PROJECT_URL,
+    DEVELOPER_MAIL
 )
 
 from .stat import ensure_permissions, change_permissions, PathT

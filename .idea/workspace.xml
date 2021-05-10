@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="preferences: check if value is empty or None (possible when creating an empty file)&#10;&#10;In addition, some fixes were added as the &quot;configupdater&quot; does not directly accesses the value but the entire &quot;Option&quot; object instead, so the returning value was always &quot;Option&quot; instead of the desired data type">
+    <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="main: handle any possible exception that occurs during initialization">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/utils/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/constants.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -87,7 +91,7 @@
       <updated>1620411970217</updated>
       <workItem from="1620411973488" duration="977000" />
       <workItem from="1620458029158" duration="14460000" />
-      <workItem from="1620482440604" duration="14058000" />
+      <workItem from="1620482440604" duration="15672000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -201,7 +205,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620638205077</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="main: handle any possible exception that occurs during initialization">
+      <created>1620638421818</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1620638421818</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -234,6 +245,7 @@
     <MESSAGE value="permissions: ensure correct permissions when reading/writing to config file" />
     <MESSAGE value="preferences: use &quot;configupdater&quot; and create empty preferences if they does not exist" />
     <MESSAGE value="preferences: check if value is empty or None (possible when creating an empty file)&#10;&#10;In addition, some fixes were added as the &quot;configupdater&quot; does not directly accesses the value but the entire &quot;Option&quot; object instead, so the returning value was always &quot;Option&quot; instead of the desired data type" />
-    <option name="LAST_COMMIT_MESSAGE" value="preferences: check if value is empty or None (possible when creating an empty file)&#10;&#10;In addition, some fixes were added as the &quot;configupdater&quot; does not directly accesses the value but the entire &quot;Option&quot; object instead, so the returning value was always &quot;Option&quot; instead of the desired data type" />
+    <MESSAGE value="main: handle any possible exception that occurs during initialization" />
+    <option name="LAST_COMMIT_MESSAGE" value="main: handle any possible exception that occurs during initialization" />
   </component>
 </project>

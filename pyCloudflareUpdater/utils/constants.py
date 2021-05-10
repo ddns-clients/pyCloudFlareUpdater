@@ -19,6 +19,8 @@ import logging
 DESCRIPTION = """pyCloudflareUpdater\n\n
 The first time this application is executed, all params must be included in order to save the user preferences 
 and do this process automatically."""
+PROJECT_URL = "https://github.com/ddns-clients/pyCloudFlareUpdater"
+DEVELOPER_MAIL = 'dev@javinator9889.com'
 CLOUDFLARE_BASE_URL = "https://api.cloudflare.com/client/v4/{0}"
 
 # Logging constants
@@ -37,8 +39,7 @@ VALID_LOGGING_LEVELS = {logging.DEBUG, logging.WARN, logging.INFO,
                         logging.NOTSET}
 
 # Preferences settings
-DEFAULT_SETTINGS = """
-[Logging]
+DEFAULT_SETTINGS = """[Logging]
 # Log file to append/create logs. Recommended using a custom folder
 # as old logs are periodically compressed and saved at the same location.
 #
