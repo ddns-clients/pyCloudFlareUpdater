@@ -21,19 +21,32 @@ from .. import (
     PRODUCTION_FILE_LOG_LEVEL, VALID_LOGGING_LEVELS, DEFAULT_SETTINGS,
     ensure_permissions, change_permissions
 )
+from configupdater import ConfigUpdater, Section, Option
 from cryptography.fernet import InvalidToken
-# from configparser import ConfigParser
-from configupdater import ConfigUpdater
-from typing import Union
+from ..utils.str import is_none_or_empty
+from typing import Union, Optional, Any
 from pathlib import Path
 import os
 import logging
 import warnings
 
 
+def get_or_error(config: Section,
+                 option: str,
+                 error_msg: str,
+                 default: Optional[Any] = None):
+    if option not in config:
+        raise KeyError(error_msg)
+    v = config.get(option, default)
+    if v is not None and isinstance(v, Option) and is_none_or_empty(v.value):
+        if default is None:
+            raise ValueError(error_msg)
+        v = default
+    return v.value if isinstance(v, Option) else v
+
+
 class Preferences:
     __instance__ = None
-
     file = "%s/.config/cloudflare-ddns.ini" % Path.home()
 
     def __new__(cls, *args, **kwargs):
@@ -54,7 +67,7 @@ class Preferences:
                  log_file: str = None,
                  log_level: int = PRODUCTION_FILE_LOG_LEVEL):
         if self.__must_init:
-            self.config = ConfigUpdater(allow_no_value=True)
+            self.config = ConfigUpdater()
             if not os.path.exists(self.file):
                 self.create_empty_file()
             self.config.read(self.file)
@@ -89,19 +102,46 @@ class Preferences:
             log = self.config['Logging']
             service = self.config['Service']
 
-            self.domain = cloudflare.get('domain', domain)
-            self.name = cloudflare.get('name', name)
-            self.frequency = int(
-                cloudflare.get('frequency-minutes', update_time))
-            self.key = cloudflare.get('api-key', key)
-            self.mail = cloudflare.get('mail', mail)
-            self.use_proxy = bool(cloudflare.get('use-proxy', str(use_proxy)))
+            error_base = '"%s" must be defined and cannot be empty!'
 
-            self.logging_file = log.get('file', log_file)
-            self.logging_level = \
-                log.get('level', logging.getLevelName(log_level))
+            self.domain = get_or_error(cloudflare,
+                                       'domain',
+                                       error_base % 'Domain',
+                                       default=domain)
+            self.name = get_or_error(cloudflare,
+                                     'name',
+                                     error_base % 'A-Record (name)',
+                                     default=name)
+            self.frequency = int(get_or_error(cloudflare,
+                                              'frequency-minutes',
+                                              error_base % 'Frequency',
+                                              default=update_time))
+            self.key = get_or_error(cloudflare,
+                                    'api-key',
+                                    error_base % 'API Key',
+                                    default=key)
+            self.mail = get_or_error(cloudflare,
+                                     'mail',
+                                     error_base % 'Mail',
+                                     default=mail)
+            self.use_proxy = bool(get_or_error(cloudflare,
+                                               'use-proxy',
+                                               error_base % 'Proxied',
+                                               default=str(use_proxy)))
 
-            self.pid_file = service.get('pid-file', pid_file)
+            self.logging_file = get_or_error(log,
+                                             'file',
+                                             error_base % 'Log file',
+                                             default=log_file)
+            self.logging_level = get_or_error(log,
+                                              'level',
+                                              error_base % 'Logging level',
+                                              logging.getLevelName(log_level))
+
+            self.pid_file = get_or_error(service,
+                                         'pid-file',
+                                         error_base % 'PID file',
+                                         default=pid_file)
 
             with open(self.file, 'w') as configfile:
                 self.config.write(configfile)
@@ -113,37 +153,37 @@ class Preferences:
 
     @property
     def domain(self) -> str:
-        return self.config['Cloudflare']['domain']
+        return self.config['Cloudflare']['domain'].value
 
     @domain.setter
     def domain(self, new_domain: str):
         if new_domain is None:
             raise ValueError("Domain must be provided!")
-        self.config['Cloudflare']['domain'] = new_domain
+        self.config['Cloudflare']['domain'].value = new_domain
 
     @property
     def name(self) -> str:
-        return self.config['Cloudflare']['name']
+        return self.config['Cloudflare']['name'].value
 
     @name.setter
     def name(self, new_A: str):
         if new_A is None:
             raise ValueError("'A' record must be provided!")
-        self.config['Cloudflare']['name'] = new_A
+        self.config['Cloudflare']['name'].value = new_A
 
     @property
     def frequency(self) -> int:
-        return int(self.config['Cloudflare']['frequency-minutes'])
+        return int(self.config['Cloudflare']['frequency-minutes'].value)
 
     @frequency.setter
     def frequency(self, new_freq: int):
         if new_freq is None:
             raise ValueError("Update frequency must be provided")
-        self.config['Cloudflare']['frequency-minutes'] = str(new_freq)
+        self.config['Cloudflare']['frequency-minutes'].value = str(new_freq)
 
     @property
     def key(self) -> str:
-        apikey = self.config['Cloudflare']['api-key']
+        apikey = self.config['Cloudflare']['api-key'].value
         key = read_from_kr('cloudflare-key')
         if key is None:
             raise AttributeError('Key was not created! Unexpected failure')
@@ -162,41 +202,41 @@ class Preferences:
             raise AttributeError('Key was not created! Unexpected failure')
         if not is_valid_token(new_key.encode(), key):
             new_key = encrypt(new_key.encode(), key).decode()
-        self.config['Cloudflare']['api-key'] = new_key
+        self.config['Cloudflare']['api-key'].value = new_key
 
     @property
     def mail(self) -> str:
-        return self.config['Cloudflare']['mail']
+        return self.config['Cloudflare']['mail'].value
 
     @mail.setter
     def mail(self, new_mail: str):
         if new_mail is None:
             raise ValueError("Mail must be provided!")
-        self.config['Cloudflare']['mail'] = new_mail
+        self.config['Cloudflare']['mail'].value = new_mail
 
     @property
     def use_proxy(self) -> bool:
-        return bool(self.config['Cloudflare']['use-proxy'])
+        return bool(self.config['Cloudflare']['use-proxy'].value)
 
     @use_proxy.setter
     def use_proxy(self, use: bool):
         if use is None:
             raise ValueError("Whether to use a proxy or not must be specified!")
-        self.config['Cloudflare']['use-proxy'] = str(use)
+        self.config['Cloudflare']['use-proxy'].value = str(use)
 
     @property
     def logging_file(self) -> str:
-        return self.config['Logging']['file']
+        return self.config['Logging']['file'].value
 
     @logging_file.setter
     def logging_file(self, file: str):
         if file is None:
             warnings.warn("No data will be logged to any file!")
-        self.config['Logging']['file'] = file
+        self.config['Logging']['file'].value = file
 
     @property
     def logging_level(self) -> int:
-        return logging.getLevelName(self.config['Logging']['level'])
+        return logging.getLevelName(self.config['Logging']['level'].value)
 
     @logging_level.setter
     def logging_level(self, level: Union[int, str]):
@@ -204,17 +244,17 @@ class Preferences:
             level = logging.getLevelName(level)
         if level not in VALID_LOGGING_LEVELS:
             raise ValueError("Logging level is not valid!")
-        self.config['Logging']['level'] = logging.getLevelName(level)
+        self.config['Logging']['level'].value = logging.getLevelName(level)
 
     @property
     def pid_file(self) -> str:
-        return self.config['Service']['pid-file']
+        return self.config['Service']['pid-file'].value
 
     @pid_file.setter
     def pid_file(self, file: str):
         if file is None:
             raise ValueError("PID file must be provided!")
-        self.config['Service']['pid-file'] = file
+        self.config['Service']['pid-file'].value = file
 
     def reload(self):
         self._check_perms()
@@ -226,7 +266,7 @@ class Preferences:
             self.config.write(configfile)
 
     @staticmethod
-    def create_empty_file():
+    def create_empty_file() -> bool:
         if not os.path.exists(Preferences.file):
             config_dir = os.path.dirname(Preferences.file)
             if not os.path.exists(config_dir):
@@ -237,3 +277,6 @@ class Preferences:
 
             if not ensure_permissions(Preferences.file, 0o700):
                 change_permissions(Preferences.file, 0o700)
+
+            return True
+        return False

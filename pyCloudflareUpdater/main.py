@@ -70,7 +70,7 @@ def parser():
                       type=str,
                       default=None,
                       help="Cloudflare domain to be updated.")
-    args.add_argument("--A",
+    args.add_argument("--name",
                       metavar='A-RECORD',
                       type=str,
                       default=None,
@@ -101,6 +101,20 @@ def parser():
                       help="By default, the program runs as a daemon in "
                            "background. With this option enabled, "
                            "the program will run only once and then exit.")
+    args.add_argument("--init-config",
+                      action="store_true",
+                      default=False,
+                      help="Creates the configuration file at the specific "
+                           "location with no contents but the keys with no"
+                           "values (ready to be full-filled). When this "
+                           "option is set, the program creates the file and "
+                           "exits.")
+    args.add_argument("--config-file",
+                      type=str,
+                      default="%s/.config/cloudflare-ddns.ini" % Path.home(),
+                      metavar="PATH",
+                      help="Defines the daemon's config file location. "
+                           "Defaults to: \"~/.config/cloudflare-ddns.ini\"")
     args.add_argument("--pid-file",
                       type=str,
                       default=None,
@@ -124,8 +138,16 @@ def parser():
                       metavar="GROUP-NAME",
                       help="Run the daemon as the specified group.")
     p_args = args.parse_args()
+    Preferences.file = p_args.config_file
+    if p_args.init_config:
+        if Preferences.create_empty_file():
+            print('Created configuration file at "%s"' % Preferences.file)
+            exit(0)
+        else:
+            print('File already exists! Not doing anything...')
+            exit(1)
     preferences = Preferences(domain=p_args.domain,
-                              name=p_args.A,
+                              name=p_args.name,
                               update_time=p_args.time,
                               key=p_args.key,
                               mail=p_args.mail,

@@ -27,7 +27,12 @@ from .utils import (
     DEFAULT_SETTINGS
 )
 
-from .utils import ensure_permissions, change_permissions, PathT
+from .utils import (
+    ensure_permissions,
+    change_permissions,
+    PathT,
+    is_none_or_empty
+)
 
 from .logging_utils import init_logging
 
