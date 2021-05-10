@@ -79,10 +79,10 @@ class Preferences:
             uid = os.geteuid()
             log_file = \
                 log_file or "/var/log/cloudflare-ddns.log" if uid == 0 \
-                    else "%s/log/cloudflare-ddns.log" % home
+                    else f"{home}/log/cloudflare-ddns.log"
             pid_file = \
                 pid_file or "/var/run/cloudflare-ddns.pid" if uid == 0 \
-                    else "%s/.cache/cloudflare-ddns.pid" % home
+                    else f"{home}/.cache/cloudflare-ddns.pid"
 
             log_file_dir = os.path.dirname(log_file)
             if not os.path.exists(log_file_dir):
