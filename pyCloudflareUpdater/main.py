@@ -138,63 +138,74 @@ def parser():
                       metavar="GROUP-NAME",
                       help="Run the daemon as the specified group.")
     p_args = args.parse_args()
-    Preferences.file = p_args.config_file
-    if p_args.init_config:
-        if Preferences.create_empty_file():
-            print('Created configuration file at "%s"' % Preferences.file)
-            exit(0)
-        else:
-            print('File already exists! Not doing anything...')
-            exit(1)
-    preferences = Preferences(domain=p_args.domain,
-                              name=p_args.name,
-                              update_time=p_args.time,
-                              key=p_args.key,
-                              mail=p_args.mail,
-                              use_proxy=p_args.proxied,
-                              pid_file=p_args.pid_file,
-                              log_file=p_args.log_file)
+    try:
+        Preferences.file = p_args.config_file
+        if p_args.init_config:
+            if Preferences.create_empty_file():
+                print('Created configuration file at "%s"' % Preferences.file)
+                exit(0)
+            else:
+                print('File already exists! Not doing anything...')
+                exit(1)
+        preferences = Preferences(domain=p_args.domain,
+                                  name=p_args.name,
+                                  update_time=p_args.time,
+                                  key=p_args.key,
+                                  mail=p_args.mail,
+                                  use_proxy=p_args.proxied,
+                                  pid_file=p_args.pid_file,
+                                  log_file=p_args.log_file)
 
-    log = init_logging(LOGGER_NAME,
-                       log_file=preferences.logging_file,
-                       file_level=preferences.logging_level)
-    fds = []
-    for handler in log.handlers:
-        if isinstance(handler, RotatingFileHandler):
-            fds.append(handler.stream.fileno())
+        log = init_logging(LOGGER_NAME,
+                           log_file=preferences.logging_file,
+                           file_level=preferences.logging_level)
+        fds = []
+        for handler in log.handlers:
+            if isinstance(handler, RotatingFileHandler):
+                fds.append(handler.stream.fileno())
 
-    uid = getpwnam(p_args.user) if p_args.user is not None else None
-    gid = getgrnam(p_args.group) if p_args.group is not None else None
+        uid = getpwnam(p_args.user) if p_args.user is not None else None
+        gid = getgrnam(p_args.group) if p_args.group is not None else None
 
-    pid_file = daemon.pidfile.PIDLockFile(preferences.pid_file)
+        pid_file = daemon.pidfile.PIDLockFile(preferences.pid_file)
 
-    def handle_sigterm():
+        def handle_sigterm():
+            try:
+                log.warning('SIGTERM received! Finishing...')
+                preferences.save()
+                pid_file.break_lock()
+                os.remove(pid_file.path)
+                log.warning('Cloudflare DDNS finished correctly')
+                for handler in log.handlers:
+                    handler.close()
+                exit(0)
+            except Exception as e:
+                log.fatal('Unable to finish correctly! - %s',
+                          str(e),
+                          exc_info=True)
+                exit(1)
+
+        context = daemon.DaemonContext(
+            working_directory=Path.home(),
+            umask=0o002,
+            pidfile=pid_file,
+            files_preserve=fds,
+            signal_map={
+                signal.SIGTERM: handle_sigterm,
+                signal.SIGHUP: handle_sigterm,
+                signal.SIGUSR1: preferences.reload
+            },
+            uid=uid,
+            gid=gid
+        )
+
+        with context:
+            main(preferences, log, single_run=p_args.no_daemonize)
+    except Exception as err:
         try:
-            log.warning('SIGTERM received! Finishing...')
-            preferences.save()
-            pid_file.break_lock()
-            os.remove(pid_file.path)
-            log.warning('Cloudflare DDNS finished correctly')
-            for handler in log.handlers:
-                handler.close()
-            exit(0)
-        except Exception as e:
-            log.fatal('Unable to finish correctly! - %s', str(e), exc_info=True)
+            log.fatal(str(err))
+        except NameError:
+            pass
+        finally:
+            print(str(err))
             exit(1)
-
-    context = daemon.DaemonContext(
-        working_directory=Path.home(),
-        umask=0o002,
-        pidfile=pid_file,
-        files_preserve=fds,
-        signal_map={
-            signal.SIGTERM: handle_sigterm,
-            signal.SIGHUP: handle_sigterm,
-            signal.SIGUSR1: preferences.reload
-        },
-        uid=uid,
-        gid=gid
-    )
-
-    with context:
-        main(preferences, log, single_run=p_args.no_daemonize)
