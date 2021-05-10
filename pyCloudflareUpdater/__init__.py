@@ -26,7 +26,8 @@ from .utils import (
     DESCRIPTION,
     DEFAULT_SETTINGS,
     PROJECT_URL,
-    DEVELOPER_MAIL
+    DEVELOPER_MAIL,
+    VALID_RECORD_TYPES
 )
 
 from .utils import (

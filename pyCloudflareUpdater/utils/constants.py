@@ -21,7 +21,12 @@ The first time this application is executed, all params must be included in orde
 and do this process automatically."""
 PROJECT_URL = "https://github.com/ddns-clients/pyCloudFlareUpdater"
 DEVELOPER_MAIL = 'dev@javinator9889.com'
+
+# Cloudflare data
 CLOUDFLARE_BASE_URL = "https://api.cloudflare.com/client/v4/{0}"
+VALID_RECORD_TYPES = {'A', 'AAAA', 'CNAME', 'HTTPS', 'TXT', 'SRV', 'LOC', 'MX',
+                      'NS', 'SPF', 'CERT', 'DNSKEY', 'DS', 'NAPTR', 'SMIMEA',
+                      'SSHFP', 'SVCB', 'TLSA', 'URI'}
 
 # Logging constants
 LOGGER_NAME = "cloudflare:logger"
@@ -58,6 +63,18 @@ domain =
 # The record to update. As this is a DDNS client, it is suggested to
 # update de 'A' Record (but a CNAME is also OK).
 name = 
+# The record's type to set. If using 'A' record, then "type = A". Valid
+# values are: 
+# A, AAAA, CNAME, HTTPS, TXT, SRV, LOC, MX, NS, SPF, CERT, DNSKEY, DS, NAPTR, 
+#                     SMIMEA, SSHFP, SVCB, TLSA, URI
+# 
+# Defaults: A
+type = 
+# TTL (Time To Live) for the specific DNS record, in seconds. Using the value
+# of '1' sets it to automatic.
+#
+# Defaults: 1 (automatic)
+ttl = 
 # The minimum frequency when checking for updates, in minutes.
 #
 # Defaults: 1 (minute)

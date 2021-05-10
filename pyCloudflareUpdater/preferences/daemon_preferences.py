@@ -19,7 +19,7 @@ from .crypt import (
 )
 from .. import (
     PRODUCTION_FILE_LOG_LEVEL, VALID_LOGGING_LEVELS, DEFAULT_SETTINGS,
-    ensure_permissions, change_permissions
+    ensure_permissions, change_permissions, VALID_RECORD_TYPES
 )
 from configupdater import ConfigUpdater, Section, Option
 from cryptography.fernet import InvalidToken
@@ -37,7 +37,7 @@ def get_or_error(config: Section,
                  default: Optional[Any] = None):
     if option not in config:
         raise KeyError(error_msg)
-    v = config.get(option, default)
+    v = config.get(option, str(default))
     if v is not None and isinstance(v, Option) and is_none_or_empty(v.value):
         if default is None:
             raise ValueError(error_msg)
@@ -59,6 +59,8 @@ class Preferences:
     def __init__(self,
                  domain: str = None,
                  name: str = None,
+                 rtype: str = None,
+                 ttl: int = None,
                  update_time: int = None,
                  key: str = None,
                  mail: str = None,
@@ -110,8 +112,16 @@ class Preferences:
                                        default=domain)
             self.name = get_or_error(cloudflare,
                                      'name',
-                                     error_base % 'A-Record (name)',
+                                     error_base % 'Record (name)',
                                      default=name)
+            self.type = get_or_error(cloudflare,
+                                     'type',
+                                     error_base % 'Record (type)',
+                                     default=rtype)
+            self.ttl = int(get_or_error(cloudflare,
+                                        'ttl',
+                                        error_base % 'TTL (Time To Live)',
+                                        default=ttl))
             self.frequency = int(get_or_error(cloudflare,
                                               'frequency-minutes',
                                               error_base % 'Frequency',
@@ -166,10 +176,36 @@ class Preferences:
         return self.config['Cloudflare']['name'].value
 
     @name.setter
-    def name(self, new_A: str):
-        if new_A is None:
-            raise ValueError("'A' record must be provided!")
-        self.config['Cloudflare']['name'].value = new_A
+    def name(self, new_name: str):
+        if new_name is None:
+            raise ValueError("Record's name must be provided!")
+        self.config['Cloudflare']['name'].value = new_name
+
+    @property
+    def type(self) -> str:
+        return self.config['Cloudflare']['type'].value
+
+    @type.setter
+    def type(self, new_type: str):
+        if new_type is None:
+            raise ValueError("Record's type must be provided!")
+        if new_type not in VALID_RECORD_TYPES:
+            raise ValueError(f"Record type '{new_type}' is not a valid value! "
+                             "Available options are: "
+                             f"{sorted(VALID_RECORD_TYPES)}")
+        self.config['Cloudflare']['type'].value = new_type
+
+    @property
+    def ttl(self) -> int:
+        return int(self.config['Cloudflare']['ttl'].value)
+
+    @ttl.setter
+    def ttl(self, new_ttl: int):
+        if new_ttl is None:
+            raise ValueError('TTL value must be provided!')
+        if new_ttl < 1:
+            raise ValueError("TTL must be, at least, '1' (automatic) or bigger")
+        self.config['Cloudflare']['ttl'].value = str(new_ttl)
 
     @property
     def frequency(self) -> int:

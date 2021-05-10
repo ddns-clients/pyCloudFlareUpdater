@@ -23,7 +23,10 @@ from grp import getgrnam
 from .logging_utils import init_logging
 from .preferences import Preferences
 from .network import Cloudflare, get_machine_public_ip
-from .utils import DESCRIPTION, LOGGER_NAME, PROJECT_URL, DEVELOPER_MAIL
+from .utils import (
+    DESCRIPTION, LOGGER_NAME, PROJECT_URL, DEVELOPER_MAIL,
+    VALID_RECORD_TYPES
+)
 import os
 import daemon
 import daemon.pidfile
@@ -68,7 +71,7 @@ def main(preferences: Preferences,
         log.error(f'Unexpected exception registered! "{str(e)}"')
         log.error(f'Please, submit the following traceback at {PROJECT_URL} '
                   f'or email it at {DEVELOPER_MAIL}')
-        log.error(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Stacktrace:\n"
+        log.error("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Stacktrace:\n"
                   f"{traceback.format_exc()}\n"
                   "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         exit_code = 1
@@ -86,10 +89,21 @@ def parser():
                       default=None,
                       help="Cloudflare domain to be updated.")
     args.add_argument("--name",
-                      metavar='A-RECORD',
+                      metavar='RECORD NAME',
                       type=str,
                       default=None,
-                      help="Cloudflare 'A' Record name.")
+                      help="Cloudflare Record's name to update.")
+    args.add_argument("--type",
+                      metavar="RECORD TYPE",
+                      default='A',
+                      help="Cloudflare Record's type to update. "
+                           "Defaults to 'A'",
+                      choices=sorted(VALID_RECORD_TYPES))
+    args.add_argument("--ttl",
+                      default=1,
+                      type=int,
+                      help="DNS record's TTL (Time To Live) value. Defaults "
+                           "to '1' (automatic)")
     args.add_argument("--time",
                       type=int,
                       default=5,
@@ -164,6 +178,8 @@ def parser():
                 exit(1)
         preferences = Preferences(domain=p_args.domain,
                                   name=p_args.name,
+                                  rtype=p_args.type,
+                                  ttl=p_args.ttl,
                                   update_time=p_args.time,
                                   key=p_args.key,
                                   mail=p_args.mail,
