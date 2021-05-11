@@ -2,6 +2,7 @@ from os import path
 from sys import version
 
 from setuptools import setup
+from pyCloudflareUpdater import VERSION
 
 if version < '3':
     raise RuntimeError("Python 3 is, at least, needed")
@@ -12,7 +13,7 @@ with open(path.join(this, "README.md"), encoding="utf-8") as f:
 
 setup(
     name='pyCloudflareUpdater',
-    version='2.0.0',
+    version=VERSION,
     packages=['pyCloudflareUpdater',
               'pyCloudflareUpdater.utils',
               'pyCloudflareUpdater.network',
@@ -22,7 +23,7 @@ setup(
     license='GPLv3',
     author='Javinator9889',
     author_email='contact@javinator9889.com',
-    description='DDNS service for dynamically update Cloudflare \'A\' Records',
+    description='DDNS service for dynamically update Cloudflare DNS Records',
     long_description=long_description,
     long_description_content_type='text/markdown',
     include_package_data=False,
@@ -47,7 +48,6 @@ setup(
         'Operating System :: POSIX :: Linux',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',

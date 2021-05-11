@@ -16,9 +16,12 @@
 from logging import DEBUG, INFO, WARNING
 import logging
 
-DESCRIPTION = """pyCloudflareUpdater\n\n
-The first time this application is executed, all params must be included in order to save the user preferences 
-and do this process automatically."""
+VERSION = '2.0.0'
+VERSION_CODE = 200
+VERSION_NAME = 'Reborn'
+DESCRIPTION = f"""pyCloudflareUpdater (cloudflare-ddns) - "{VERSION_NAME}" v{VERSION} ({VERSION_CODE})
+ — A DDNS (Dynamic DNS) client that periodically updates Cloudflare's DNS 
+records when IP address changes"""
 PROJECT_URL = "https://github.com/ddns-clients/pyCloudFlareUpdater"
 DEVELOPER_MAIL = 'dev@javinator9889.com'
 

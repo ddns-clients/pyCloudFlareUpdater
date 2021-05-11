@@ -1,13 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="Py3.5: drop support for Python 3.5&#10;&#10;This decision comes from some libraries that does not allow the usage of Python 3.5. As May 2021, it is known that most distributions now use from Python 3.6 up-to Python 3.8. In addition, some external tools allow the installation of any Python version system independent (e.g.: pyenv). Use them instead">
+    <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/utils/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/constants.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -62,6 +57,13 @@
       </RecentBranches>
     </option>
   </component>
+  <component name="LogFilters">
+    <option name="FILTER_ERRORS" value="false" />
+    <option name="FILTER_WARNINGS" value="false" />
+    <option name="FILTER_INFO" value="true" />
+    <option name="FILTER_DEBUG" value="true" />
+    <option name="CUSTOM_FILTER" />
+  </component>
   <component name="ProjectId" id="1sDfEROh2TYMSRQyTnPFmbPwuGJ" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
@@ -72,7 +74,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/entrypoint.py" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -80,6 +82,83 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="Errors" />
+  </component>
+  <component name="RunManager" selected="Python.pyCloudflareUpdater - profile">
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <log_file alias="cloudflare-log" path="$USER_HOME$/log/cloudflare-ddns.log" />
+      <module name="pyCloudFlareUpdater" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.pyenv/shims/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pyCloudflareUpdater" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="pyCloudflareUpdater" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pyCloudflareUpdater - profile" type="PythonConfigurationType" factoryName="Python">
+      <log_file alias="cloudflare-log" path="$USER_HOME$/log/cloudflare-ddns.log" />
+      <module name="pyCloudFlareUpdater" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="KEYRING_CRYPTPASSWD" value="123456789" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.pyenv/shims/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/entrypoint.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="pyCloudflareUpdater" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
+      <log_file alias="cloudflare-log" path="$USER_HOME$/log/cloudflare-ddns.log" />
+      <module name="pyCloudFlareUpdater" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+        <env name="KEYRING_CRYPTPASSWD" value="123456789" />
+      </envs>
+      <option name="SDK_HOME" value="$USER_HOME$/.pyenv/shims/python" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/pyCloudflareUpdater" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="pyCloudflareUpdater" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="true" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Python.pyCloudflareUpdater" />
+      <item itemvalue="Python.pyCloudflareUpdater - profile" />
+    </list>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -91,7 +170,8 @@
       <updated>1620411970217</updated>
       <workItem from="1620411973488" duration="977000" />
       <workItem from="1620458029158" duration="14460000" />
-      <workItem from="1620482440604" duration="17477000" />
+      <workItem from="1620482440604" duration="20657000" />
+      <workItem from="1620720264727" duration="3945000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -226,7 +306,21 @@
       <option name="project" value="LOCAL" />
       <updated>1620640722661</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records">
+      <created>1620641998171</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1620641998171</updated>
+    </task>
+    <task id="LOCAL-00021" summary="versioning: added version code and message.&#10;&#10;In addition, for performance purposes an &quot;entrypoint&quot; has been added for debugging code">
+      <created>1620721272428</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1620721272428</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -262,6 +356,11 @@
     <MESSAGE value="main: handle any possible exception that occurs during initialization" />
     <MESSAGE value="main: format HTTPError exceptions and catch'em all while looping, if possible.&#10;&#10;Any non captured exception will cause the program to unavoidable fail. Suggest reporting the issue to Github or mailing it to the developer's account" />
     <MESSAGE value="Py3.5: drop support for Python 3.5&#10;&#10;This decision comes from some libraries that does not allow the usage of Python 3.5. As May 2021, it is known that most distributions now use from Python 3.6 up-to Python 3.8. In addition, some external tools allow the installation of any Python version system independent (e.g.: pyenv). Use them instead" />
-    <option name="LAST_COMMIT_MESSAGE" value="Py3.5: drop support for Python 3.5&#10;&#10;This decision comes from some libraries that does not allow the usage of Python 3.5. As May 2021, it is known that most distributions now use from Python 3.6 up-to Python 3.8. In addition, some external tools allow the installation of any Python version system independent (e.g.: pyenv). Use them instead" />
+    <MESSAGE value="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records" />
+    <MESSAGE value="versioning: added version code and message.&#10;&#10;In addition, for performance purposes an &quot;entrypoint&quot; has been added for debugging code" />
+    <option name="LAST_COMMIT_MESSAGE" value="versioning: added version code and message.&#10;&#10;In addition, for performance purposes an &quot;entrypoint&quot; has been added for debugging code" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/pyCloudFlareUpdater$pyCloudflareUpdater.coverage" NAME="pyCloudflareUpdater Coverage Results" MODIFIED="1620673362192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pyCloudflareUpdater" />
   </component>
 </project>
