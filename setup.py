@@ -39,7 +39,8 @@ setup(
                       'keyring>=23',
                       'keyrings.cryptfile>=1,<2',
                       'cryptography>=3',
-                      'ConfigUpdater>=2'],
+                      'ConfigUpdater>=2',
+                      'colorama>=0.4'],
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Programming Language :: Python',

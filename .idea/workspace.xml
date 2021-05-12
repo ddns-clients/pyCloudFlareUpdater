@@ -2,7 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records">
+      <change afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/cache.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/entrypoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/entrypoint.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/__main__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/crypt.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/crypt.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,7 +183,7 @@
       <workItem from="1620411973488" duration="977000" />
       <workItem from="1620458029158" duration="14460000" />
       <workItem from="1620482440604" duration="20657000" />
-      <workItem from="1620720264727" duration="3945000" />
+      <workItem from="1620720264727" duration="11129000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -320,7 +332,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620721272428</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="versioning: added version code and message.&#10;&#10;In addition, for performance purposes an &quot;entrypoint&quot; has been added for debugging code">
+      <created>1620809419493</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1620809419493</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

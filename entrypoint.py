@@ -13,8 +13,10 @@
 #
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
+import asyncio
 from pyCloudflareUpdater.main import parser
 
 
 if __name__ == '__main__':
-    parser()
+    routine = parser()
+    asyncio.run(routine)

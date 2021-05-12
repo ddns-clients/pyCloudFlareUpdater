@@ -15,9 +15,9 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 from logging.handlers import RotatingFileHandler
 from argparse import ArgumentParser
+from colorama import Back, Style
 from logging import Logger
 from pathlib import Path
-from time import sleep
 from pwd import getpwnam
 from grp import getgrnam
 from .logging_utils import init_logging
@@ -34,19 +34,20 @@ import socket
 import signal
 import traceback
 import requests
+import asyncio
 
 
-def main(preferences: Preferences,
-         log: Logger,
-         single_run: bool = False):
+async def main(preferences: Preferences,
+               log: Logger,
+               single_run: bool = False):
     continue_running = True
     exit_code = 0
     try:
         cloudflare = Cloudflare(preferences)
-        latest_ip = cloudflare.ip
+        latest_ip = await cloudflare.ip
         while continue_running:
             try:
-                current_ip = get_machine_public_ip()
+                current_ip = await get_machine_public_ip()
                 log.info("Current machine IP: \"{0}\"".format(current_ip))
                 if current_ip != latest_ip:
                     log.warning(f'IP changed! {latest_ip} -> {current_ip}')
@@ -63,7 +64,7 @@ def main(preferences: Preferences,
                 log.critical('HTTP error when accessing '
                              f'{httperr.request}!\n{httperr}')
             finally:
-                sleep(preferences.frequency)
+                await asyncio.sleep(preferences.frequency)
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
         exit_code = 130
@@ -76,11 +77,11 @@ def main(preferences: Preferences,
                   "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         exit_code = 1
     finally:
-        preferences.save()
+        await preferences.save_async()
         exit(exit_code)
 
 
-def parser():
+async def parser():
     args = ArgumentParser(prog='cloudflare-ddns',
                           description=DESCRIPTION,
                           allow_abbrev=False)
@@ -170,22 +171,14 @@ def parser():
     try:
         Preferences.file = p_args.config_file
         if p_args.init_config:
-            if Preferences.create_empty_file():
+            if await Preferences.create_empty_file():
                 print(f'Created configuration file at "{Preferences.file}"')
                 exit(0)
             else:
                 print('File already exists! Not doing anything...')
                 exit(1)
-        preferences = Preferences(domain=p_args.domain,
-                                  name=p_args.name,
-                                  rtype=p_args.type,
-                                  ttl=p_args.ttl,
-                                  update_time=p_args.time,
-                                  key=p_args.key,
-                                  mail=p_args.mail,
-                                  use_proxy=p_args.proxied,
-                                  pid_file=p_args.pid_file,
-                                  log_file=p_args.log_file)
+
+        preferences = await Preferences.create_from_args(p_args)
 
         log = init_logging(LOGGER_NAME,
                            log_file=preferences.logging_file,
@@ -230,12 +223,12 @@ def parser():
         )
 
         with context:
-            main(preferences, log, single_run=p_args.no_daemonize)
+            await main(preferences, log, single_run=p_args.no_daemonize)
     except Exception as err:
         try:
             log.fatal(str(err))
         except NameError:
             pass
         finally:
-            print(str(err))
+            print(f"{Back.RED}Error: {str(err)}{Style.RESET_ALL}")
             exit(1)

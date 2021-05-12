@@ -23,7 +23,7 @@ from ..preferences import Preferences
 from ..utils import CLOUDFLARE_BASE_URL
 
 
-def get_machine_public_ip():
+async def get_machine_public_ip():
     return requests.get('https://ident.me/').text
 
 
@@ -41,7 +41,10 @@ class Cloudflare:
             'Content-Type': 'application/json'
         }
 
-    def _do_request(self, path: str, method: str = 'GET', data=None) -> json:
+    async def _do_request(self,
+                          path: str,
+                          method: str = 'GET',
+                          data=None) -> json:
         tmp_headers = self._construct_headers()
         if self.session.headers != tmp_headers:
             self.session.headers.update(tmp_headers)
@@ -61,24 +64,27 @@ class Cloudflare:
         return res['result']
 
     @property
-    def zone(self) -> str:
+    async def zone(self) -> str:
         path = f"zones?name={self.preferences.name}" \
                f"&status=active&page=1&per_page=1&match=all"
-        return self._do_request(path)[0]['id']
+        r = await self._do_request(path)
+        return r[0]['id']
 
     @property
-    def identifier(self) -> str:
+    async def identifier(self) -> str:
         path = f"zones/{self.zone}/dns_records?type=A" \
                f"&name={self.preferences.name}&page=1&per_page=1"
-        return self._do_request(path)[0]['id']
+        r = await self._do_request(path)
+        return r[0]['id']
 
     @property
-    def ip(self) -> str:
+    async def ip(self) -> str:
         path = f"zones/{self.zone}/dns_records/{self.identifier}"
-        return self._do_request(path)['content']
+        r = await self._do_request(path)
+        return r['content']
 
     @ip.setter
-    def ip(self, new_ip: str):
+    async def ip(self, new_ip: str):
         data = {
             'type': 'A',
             'name': self.preferences.name,
@@ -87,4 +93,4 @@ class Cloudflare:
             'proxied': self.preferences.use_proxy
         }
         path = f"zones/{self.zone}/dns_records/{self.identifier}"
-        self._do_request(path, method='POST', data=data)
+        await self._do_request(path, method='POST', data=data)
