@@ -14,6 +14,7 @@
 #     You should have received a copy of the GNU General Public License
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 from logging.handlers import RotatingFileHandler
+from typing import Awaitable, Callable, Any
 from argparse import ArgumentParser
 from colorama import Back, Style
 from logging import Logger
@@ -37,6 +38,11 @@ import requests
 import asyncio
 
 
+def launch(fn: Callable[..., Awaitable[Any]], *args, **kwargs):
+    routine = fn(*args, **kwargs)
+    asyncio.run(routine)
+
+
 async def main(preferences: Preferences,
                log: Logger,
                single_run: bool = False):
@@ -44,19 +50,14 @@ async def main(preferences: Preferences,
     exit_code = 0
     try:
         cloudflare = Cloudflare(preferences)
-        latest_ip = await cloudflare.ip
         while continue_running:
             try:
+                latest_ip = await cloudflare.ip
                 current_ip = await get_machine_public_ip()
                 log.info("Current machine IP: \"{0}\"".format(current_ip))
                 if current_ip != latest_ip:
                     log.warning(f'IP changed! {latest_ip} -> {current_ip}')
                     cloudflare.ip = current_ip
-                    latest_ip = current_ip
-                if single_run:
-                    log.info('User requested single run. Exiting...')
-                    continue_running = False
-                    continue
 
             except socket.gaierror:
                 log.warning('DNS name resolution failure! Check settings')
@@ -64,15 +65,18 @@ async def main(preferences: Preferences,
                 log.critical('HTTP error when accessing '
                              f'{httperr.request}!\n{httperr}')
             finally:
+                if single_run:
+                    log.info('User requested single run. Exiting...')
+                    break
                 await asyncio.sleep(preferences.frequency)
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
         exit_code = 130
     except Exception as e:
-        log.error(f'Unexpected exception registered! "{str(e)}"')
-        log.error(f'Please, submit the following traceback at {PROJECT_URL} '
+        log.fatal(f'Unexpected exception registered! "{str(e)}"')
+        log.fatal(f'Please, submit the following traceback at {PROJECT_URL} '
                   f'or email it at {DEVELOPER_MAIL}')
-        log.error("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Stacktrace:\n"
+        log.fatal("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Stacktrace:\n"
                   f"{traceback.format_exc()}\n"
                   "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
         exit_code = 1
@@ -223,7 +227,7 @@ async def parser():
         )
 
         with context:
-            await main(preferences, log, single_run=p_args.no_daemonize)
+            launch(main, preferences, log, single_run=p_args.no_daemonize)
     except Exception as err:
         try:
             log.fatal(str(err))

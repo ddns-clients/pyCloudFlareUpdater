@@ -2,19 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records">
-      <change afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/cache.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/entrypoint.py" beforeDir="false" afterPath="$PROJECT_DIR$/entrypoint.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/__main__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/crypt.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/crypt.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/requirements.txt" beforeDir="false" afterPath="$PROJECT_DIR$/requirements.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/setup.py" beforeDir="false" afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -183,7 +174,7 @@
       <workItem from="1620411973488" duration="977000" />
       <workItem from="1620458029158" duration="14460000" />
       <workItem from="1620482440604" duration="20657000" />
-      <workItem from="1620720264727" duration="11129000" />
+      <workItem from="1620720264727" duration="15888000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -339,7 +330,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620809419493</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="async: convert methods to asyncio implementation when possible. Added &quot;cached&quot; decorator for class properties&#10;&#10;When accessing/setting new properties, some of them require accessing to a file or decrypting a key. For performance purposes, the @cached decorator (for &quot;get&quot; methods) and it's pair @ucached (for &quot;set&quot; methods) store the correspondent new value inside a dictionary in which the key is the function name. When accessing the property, if there is a cached version available then it will be returned">
+      <created>1620816744711</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1620816744711</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -377,7 +375,8 @@
     <MESSAGE value="Py3.5: drop support for Python 3.5&#10;&#10;This decision comes from some libraries that does not allow the usage of Python 3.5. As May 2021, it is known that most distributions now use from Python 3.6 up-to Python 3.8. In addition, some external tools allow the installation of any Python version system independent (e.g.: pyenv). Use them instead" />
     <MESSAGE value="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records" />
     <MESSAGE value="versioning: added version code and message.&#10;&#10;In addition, for performance purposes an &quot;entrypoint&quot; has been added for debugging code" />
-    <option name="LAST_COMMIT_MESSAGE" value="versioning: added version code and message.&#10;&#10;In addition, for performance purposes an &quot;entrypoint&quot; has been added for debugging code" />
+    <MESSAGE value="async: convert methods to asyncio implementation when possible. Added &quot;cached&quot; decorator for class properties&#10;&#10;When accessing/setting new properties, some of them require accessing to a file or decrypting a key. For performance purposes, the @cached decorator (for &quot;get&quot; methods) and it's pair @ucached (for &quot;set&quot; methods) store the correspondent new value inside a dictionary in which the key is the function name. When accessing the property, if there is a cached version available then it will be returned" />
+    <option name="LAST_COMMIT_MESSAGE" value="async: convert methods to asyncio implementation when possible. Added &quot;cached&quot; decorator for class properties&#10;&#10;When accessing/setting new properties, some of them require accessing to a file or decrypting a key. For performance purposes, the @cached decorator (for &quot;get&quot; methods) and it's pair @ucached (for &quot;set&quot; methods) store the correspondent new value inside a dictionary in which the key is the function name. When accessing the property, if there is a cached version available then it will be returned" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/pyCloudFlareUpdater$pyCloudflareUpdater.coverage" NAME="pyCloudflareUpdater Coverage Results" MODIFIED="1620673362192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pyCloudflareUpdater" />

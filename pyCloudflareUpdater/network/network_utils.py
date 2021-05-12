@@ -17,14 +17,18 @@ try:
     import ujson as json
 except ImportError:
     import json
+import logging
 import requests
 from cachecontrol import CacheControlAdapter
 from ..preferences import Preferences
-from ..utils import CLOUDFLARE_BASE_URL
+from ..utils import CLOUDFLARE_BASE_URL, LOGGER_NAME
 
 
 async def get_machine_public_ip():
     return requests.get('https://ident.me/').text
+
+
+log = logging.getLogger(LOGGER_NAME)
 
 
 class Cloudflare:
@@ -56,8 +60,10 @@ class Cloudflare:
         if req.status_code >= 304 or not res['success']:
             error_json = res['errors'][0]
             error_msg = [f"({error_json['code']}) {error_json['message']}"]
-            for error in error_json['error_chain']:
-                error_msg.append(f"\t- ({error['code']}) {error['message']}")
+            if 'error_chain' in error_json:
+                for error in error_json['error_chain']:
+                    error_msg.append(
+                        f"\t- ({error['code']}) {error['message']}")
             raise requests.HTTPError('\n'.join(error_msg),
                                      request=url,
                                      response=error_json)
@@ -72,14 +78,17 @@ class Cloudflare:
 
     @property
     async def identifier(self) -> str:
-        path = f"zones/{self.zone}/dns_records?type=A" \
+        zone = await self.zone
+        path = f"zones/{zone}/dns_records?type=A" \
                f"&name={self.preferences.name}&page=1&per_page=1"
         r = await self._do_request(path)
         return r[0]['id']
 
     @property
     async def ip(self) -> str:
-        path = f"zones/{self.zone}/dns_records/{self.identifier}"
+        zone = await self.zone
+        identifier = await self.identifier
+        path = f"zones/{zone}/dns_records/{identifier}"
         r = await self._do_request(path)
         return r['content']
 
@@ -92,5 +101,7 @@ class Cloudflare:
             'ttl': 600,
             'proxied': self.preferences.use_proxy
         }
-        path = f"zones/{self.zone}/dns_records/{self.identifier}"
+        zone = await self.zone
+        identifier = await self.identifier
+        path = f"zones/{zone}/dns_records/{identifier}"
         await self._do_request(path, method='POST', data=data)
