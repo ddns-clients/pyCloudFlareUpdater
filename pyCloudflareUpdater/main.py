@@ -70,7 +70,7 @@ async def main(preferences: Preferences,
                 if single_run:
                     log.info('User requested single run. Exiting...')
                     break
-                await asyncio.sleep(preferences.frequency)
+                await asyncio.sleep(preferences.frequency * 60)
     except KeyboardInterrupt:
         log.warning("Received SIGINT - exiting...")
         exit_code = 130

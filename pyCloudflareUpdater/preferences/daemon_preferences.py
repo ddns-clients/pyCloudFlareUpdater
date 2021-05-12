@@ -255,6 +255,8 @@ class Preferences:
     def frequency(self, new_freq: int):
         if new_freq is None:
             raise ValueError("Update frequency must be provided")
+        if new_freq <= 0:
+            raise ValueError("Frequency must be higher than 0")
         self.config['Cloudflare']['frequency-minutes'].value = str(new_freq)
 
     @property

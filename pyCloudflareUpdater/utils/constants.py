@@ -80,7 +80,7 @@ type =
 ttl = 
 # The minimum frequency when checking for updates, in minutes.
 #
-# Defaults: 1 (minute)
+# Defaults: 5 (minutes)
 frequency-minutes = 
 # The private API key used when communicating with Cloudflare services for
 # updating/querying the stored values.
