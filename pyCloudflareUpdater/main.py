@@ -15,9 +15,9 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 from logging.handlers import RotatingFileHandler
 from typing import Awaitable, Callable, Any
+from logging import Logger, getLevelName
 from argparse import ArgumentParser
 from colorama import Back, Style
-from logging import Logger
 from pathlib import Path
 from pwd import getpwnam
 from grp import getgrnam
@@ -26,8 +26,9 @@ from .preferences import Preferences
 from .network import Cloudflare, get_machine_public_ip
 from .utils import (
     DESCRIPTION, LOGGER_NAME, PROJECT_URL, DEVELOPER_MAIL,
-    VALID_RECORD_TYPES
+    VALID_RECORD_TYPES, VALID_LOGGING_LEVELS
 )
+import sys
 import daemon
 import daemon.pidfile
 import socket
@@ -48,15 +49,17 @@ async def main(preferences: Preferences,
     continue_running = True
     exit_code = 0
     try:
+        log.debug('Initializing Cloudflare instance')
         cloudflare = Cloudflare(preferences)
         while continue_running:
             try:
                 latest_ip = await cloudflare.ip
+                log.info(f'Cloudflare\'s IP: {latest_ip}')
                 current_ip = await get_machine_public_ip()
-                log.info("Current machine IP: \"{0}\"".format(current_ip))
+                log.info(f"Current machine IP: {current_ip}")
                 if current_ip != latest_ip:
                     log.warning(f'IP changed! {latest_ip} -> {current_ip}')
-                    cloudflare.ip = current_ip
+                    await cloudflare.update_ip(current_ip)
 
             except socket.gaierror:
                 log.warning('DNS name resolution failure! Check settings')
@@ -160,6 +163,20 @@ async def parser():
                       metavar="LOCATION",
                       help="Specifies a custom LOG file for storing current "
                            "daemon logs.")
+    args.add_argument("--log-level",
+                      type=str,
+                      default="WARNING",
+                      metavar="LEVEL",
+                      help="Specifies the proper log level to use when "
+                           "running. Must be one of: DEBUG, WARN, INFO,"
+                           "CRITICAL, ERROR, FATAL, logging.NOTSET",
+                      choices=[getLevelName(lvl) for lvl in
+                               VALID_LOGGING_LEVELS])
+    args.add_argument("--console-log",
+                      action="store_true",
+                      help="Enables logging to both console and file. "
+                           "Intended for debugging purposes. Disabled by "
+                           "default.")
     args.add_argument("--user",
                       type=str,
                       default=None,
@@ -183,17 +200,25 @@ async def parser():
 
         preferences = await Preferences.create_from_args(p_args)
 
-        log = init_logging(LOGGER_NAME,
-                           log_file=preferences.logging_file,
-                           file_level=preferences.logging_level)
+        log = init_logging(log_file=preferences.logging_file,
+                           file_level=preferences.logging_level,
+                           console_level=preferences.logging_level,
+                           log_to_console=p_args.console_log)
+
+        log.debug('Logger initialized')
+
         fds = []
         for handler in log.handlers:
             if isinstance(handler, RotatingFileHandler):
                 fds.append(handler.stream.fileno())
+        log.debug('Saving logger file descriptor for avoiding closing it')
 
         uid = getpwnam(p_args.user) if p_args.user is not None else None
         gid = getgrnam(p_args.group) if p_args.group is not None else None
 
+        log.debug(f'Running daemon as {uid}:{gid} (UID:GID)')
+
+        log.debug(f'Creating locked PID file at {preferences.pid_file}')
         pid_file = daemon.pidfile.PIDLockFile(preferences.pid_file)
 
         def handle_sigterm(*_):
@@ -211,6 +236,7 @@ async def parser():
             finally:
                 pid_file.break_lock()
 
+        log.debug('Initializing daemon context')
         context = daemon.DaemonContext(
             working_directory=Path.home(),
             umask=0o002,
@@ -219,12 +245,14 @@ async def parser():
             signal_map={
                 signal.SIGTERM: handle_sigterm,
                 signal.SIGHUP: handle_sigterm,
-                signal.SIGUSR1: lambda *_: log.warning(
-                    'Reloading preferences!') and preferences.reload()
+                signal.SIGUSR1: lambda *_:
+                log.warning('Reloading preferences!') and preferences.reload()
             },
             uid=uid,
             gid=gid
         )
+        log.debug('Launching main application from daemon\'s context. '
+                  'Console logs will no longer be available')
 
         with context:
             launch(main, preferences, log, single_run=p_args.no_daemonize)
@@ -234,5 +262,6 @@ async def parser():
         except NameError:
             pass
         finally:
-            print(f"{Back.RED}Error: {str(err)}{Style.RESET_ALL}")
+            print(f"{Back.RED}Error: {str(err)}{Style.RESET_ALL}",
+                  file=sys.stderr)
             exit(1)

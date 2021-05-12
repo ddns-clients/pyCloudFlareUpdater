@@ -78,7 +78,8 @@ class Preferences:
                          mail=p_args.mail,
                          use_proxy=p_args.proxied,
                          pid_file=p_args.pid_file,
-                         log_file=p_args.log_file)
+                         log_file=p_args.log_file,
+                         log_level=p_args.log_level)
         return self
 
     async def _init(self,
@@ -270,7 +271,6 @@ class Preferences:
             return apikey
 
     @key.setter
-    @ucached('__cache__')
     def key(self, new_key: str):
         if new_key is None:
             raise ValueError("API key must be provided!")
@@ -323,7 +323,6 @@ class Preferences:
         return logging.getLevelName(self.config['Logging']['level'].value)
 
     @logging_level.setter
-    @ucached('__cache__')
     def logging_level(self, level: Union[int, str]):
         if isinstance(level, str):
             level = logging.getLevelName(level)

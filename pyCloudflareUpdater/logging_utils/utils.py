@@ -30,7 +30,8 @@ def init_logging(logger_name: Optional[str] = None,
                  log_file: Optional[str] = LOG_FILE,
                  console_level: int = DEV_CONSOLE_LOG_LEVEL,
                  file_level: int = DEV_FILE_LOG_LEVEL,
-                 log_format: str = LOG_DEFAULT_FORMAT) -> logging:
+                 log_format: str = LOG_DEFAULT_FORMAT,
+                 log_to_console: bool = False) -> logging:
     """
     Creates a custom logging that outputs to both console and file, if
     filename provided. Automatically cleans-up old logs during runtime and
@@ -42,17 +43,19 @@ def init_logging(logger_name: Optional[str] = None,
     :param console_level: the logging level for console.
     :param file_level: the logging level for the file.
     :param log_format: the logging format.
+    :param log_to_console: whether to log to a console or not.
     :return: the created logging instance
     """
+    logging.basicConfig(level=file_level, format=log_format)
     formatter = logging.Formatter(log_format)
     logger = logging.getLogger(logger_name)
-    if getattr(logger, 'created', False):
-        return logger
-    logger.created = True
     for handler in logger.handlers:
-        if type(handler) is logging.StreamHandler:
-            handler.setLevel(console_level)
-            handler.formatter = formatter
+        if isinstance(handler, logging.StreamHandler):
+            if not log_to_console:
+                logger.handlers.remove(handler)
+            else:
+                handler.setLevel(console_level)
+                handler.formatter = formatter
 
     def file_rotator(source: str, dest: str):
         """
@@ -88,5 +91,7 @@ def init_logging(logger_name: Optional[str] = None,
         if old_log:
             file_handler.doRollover()
         logger.addHandler(file_handler)
+
+    # logging.basicConfig(level=file_level, format=log_format, handlers=handlers)
 
     return logger

@@ -17,18 +17,14 @@ try:
     import ujson as json
 except ImportError:
     import json
-import logging
 import requests
 from cachecontrol import CacheControlAdapter
 from ..preferences import Preferences
-from ..utils import CLOUDFLARE_BASE_URL, LOGGER_NAME
+from ..utils import CLOUDFLARE_BASE_URL
 
 
 async def get_machine_public_ip():
     return requests.get('https://ident.me/').text
-
-
-log = logging.getLogger(LOGGER_NAME)
 
 
 class Cloudflare:
@@ -45,10 +41,10 @@ class Cloudflare:
             'Content-Type': 'application/json'
         }
 
-    async def _do_request(self,
-                          path: str,
-                          method: str = 'GET',
-                          data=None) -> json:
+    def _do_request(self,
+                    path: str,
+                    method: str = 'GET',
+                    data=None) -> json:
         tmp_headers = self._construct_headers()
         if self.session.headers != tmp_headers:
             self.session.headers.update(tmp_headers)
@@ -70,30 +66,25 @@ class Cloudflare:
         return res['result']
 
     @property
-    async def zone(self) -> str:
+    def zone(self) -> str:
         path = f"zones?name={self.preferences.name}" \
                f"&status=active&page=1&per_page=1&match=all"
-        r = await self._do_request(path)
-        return r[0]['id']
+        return self._do_request(path)[0]['id']
 
     @property
-    async def identifier(self) -> str:
-        zone = await self.zone
-        path = f"zones/{zone}/dns_records?type=A" \
+    def identifier(self) -> str:
+        path = f"zones/{self.zone}/dns_records?type=A" \
                f"&name={self.preferences.name}&page=1&per_page=1"
-        r = await self._do_request(path)
-        return r[0]['id']
+        return self._do_request(path)[0]['id']
 
     @property
-    async def ip(self) -> str:
-        zone = await self.zone
-        identifier = await self.identifier
-        path = f"zones/{zone}/dns_records/{identifier}"
-        r = await self._do_request(path)
+    def ip(self) -> str:
+        path = f"zones/{self.zone}/dns_records/{self.identifier}"
+        r = self._do_request(path)
         return r['content']
 
     @ip.setter
-    async def ip(self, new_ip: str):
+    def ip(self, new_ip: str):
         data = {
             'type': 'A',
             'name': self.preferences.name,
@@ -101,7 +92,5 @@ class Cloudflare:
             'ttl': 600,
             'proxied': self.preferences.use_proxy
         }
-        zone = await self.zone
-        identifier = await self.identifier
-        path = f"zones/{zone}/dns_records/{identifier}"
-        await self._do_request(path, method='POST', data=data)
+        path = f"zones/{self.zone}/dns_records/{self.identifier}"
+        self._do_request(path, method='POST', data=data)
