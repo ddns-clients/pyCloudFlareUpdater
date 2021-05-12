@@ -3,9 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/__main__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/network/network_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/utils/constants.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/utils/constants.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -174,7 +173,7 @@
       <workItem from="1620411973488" duration="977000" />
       <workItem from="1620458029158" duration="14460000" />
       <workItem from="1620482440604" duration="20657000" />
-      <workItem from="1620720264727" duration="15888000" />
+      <workItem from="1620720264727" duration="17735000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -337,7 +336,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620816744711</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="asyncio: create new event loop when daemon has started">
+      <created>1620825228639</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1620825228639</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -376,7 +382,8 @@
     <MESSAGE value="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records" />
     <MESSAGE value="versioning: added version code and message.&#10;&#10;In addition, for performance purposes an &quot;entrypoint&quot; has been added for debugging code" />
     <MESSAGE value="async: convert methods to asyncio implementation when possible. Added &quot;cached&quot; decorator for class properties&#10;&#10;When accessing/setting new properties, some of them require accessing to a file or decrypting a key. For performance purposes, the @cached decorator (for &quot;get&quot; methods) and it's pair @ucached (for &quot;set&quot; methods) store the correspondent new value inside a dictionary in which the key is the function name. When accessing the property, if there is a cached version available then it will be returned" />
-    <option name="LAST_COMMIT_MESSAGE" value="async: convert methods to asyncio implementation when possible. Added &quot;cached&quot; decorator for class properties&#10;&#10;When accessing/setting new properties, some of them require accessing to a file or decrypting a key. For performance purposes, the @cached decorator (for &quot;get&quot; methods) and it's pair @ucached (for &quot;set&quot; methods) store the correspondent new value inside a dictionary in which the key is the function name. When accessing the property, if there is a cached version available then it will be returned" />
+    <MESSAGE value="asyncio: create new event loop when daemon has started" />
+    <option name="LAST_COMMIT_MESSAGE" value="asyncio: create new event loop when daemon has started" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/pyCloudFlareUpdater$pyCloudflareUpdater.coverage" NAME="pyCloudflareUpdater Coverage Results" MODIFIED="1620673362192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pyCloudflareUpdater" />

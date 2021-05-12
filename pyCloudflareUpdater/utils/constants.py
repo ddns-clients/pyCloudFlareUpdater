@@ -35,7 +35,7 @@ VALID_RECORD_TYPES = {'A', 'AAAA', 'CNAME', 'HTTPS', 'TXT', 'SRV', 'LOC', 'MX',
 LOGGER_NAME = "cloudflare:logger"
 LOG_FILE = "cloudflare-ddns.log"
 LOG_DEFAULT_FORMAT = \
-    "%(process)d[%(thread)d] - %(asctime)s | [%(levelname)s]: %(message)s"
+    "%(asctime)s | [%(levelname)s]:\t%(message)s"
 PRODUCTION_CONSOLE_LOG_LEVEL = INFO
 PRODUCTION_FILE_LOG_LEVEL = WARNING
 

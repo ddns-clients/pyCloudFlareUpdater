@@ -28,7 +28,6 @@ from .utils import (
     DESCRIPTION, LOGGER_NAME, PROJECT_URL, DEVELOPER_MAIL,
     VALID_RECORD_TYPES
 )
-import os
 import daemon
 import daemon.pidfile
 import socket
@@ -197,13 +196,11 @@ async def parser():
 
         pid_file = daemon.pidfile.PIDLockFile(preferences.pid_file)
 
-        def handle_sigterm():
+        def handle_sigterm(*_):
             try:
                 log.warning('SIGTERM received! Finishing...')
                 preferences.save()
-                pid_file.break_lock()
-                os.remove(pid_file.path)
-                log.warning('Cloudflare DDNS finished correctly')
+                log.info('Cloudflare DDNS finished correctly')
                 for handler in log.handlers:
                     handler.close()
                 exit(0)
@@ -211,6 +208,8 @@ async def parser():
                 log.fatal(f'Unable to finish correctly! - {e}',
                           exc_info=True)
                 exit(1)
+            finally:
+                pid_file.break_lock()
 
         context = daemon.DaemonContext(
             working_directory=Path.home(),
@@ -220,7 +219,8 @@ async def parser():
             signal_map={
                 signal.SIGTERM: handle_sigterm,
                 signal.SIGHUP: handle_sigterm,
-                signal.SIGUSR1: preferences.reload
+                signal.SIGUSR1: lambda *_: log.warning(
+                    'Reloading preferences!') and preferences.reload()
             },
             uid=uid,
             gid=gid
