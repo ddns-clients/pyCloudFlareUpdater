@@ -53,13 +53,13 @@ async def main(preferences: Preferences,
         cloudflare = Cloudflare(preferences)
         while continue_running:
             try:
-                latest_ip = await cloudflare.ip
+                latest_ip = cloudflare.ip
                 log.info(f'Cloudflare\'s IP: {latest_ip}')
                 current_ip = await get_machine_public_ip()
                 log.info(f"Current machine IP: {current_ip}")
                 if current_ip != latest_ip:
                     log.warning(f'IP changed! {latest_ip} -> {current_ip}')
-                    await cloudflare.update_ip(current_ip)
+                    cloudflare.ip = current_ip
 
             except socket.gaierror:
                 log.warning('DNS name resolution failure! Check settings')

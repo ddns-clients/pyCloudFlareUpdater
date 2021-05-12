@@ -17,6 +17,7 @@ try:
     import ujson as json
 except ImportError:
     import json
+import logging
 import requests
 from cachecontrol import CacheControlAdapter
 from ..preferences import Preferences
@@ -31,10 +32,12 @@ class Cloudflare:
     def __init__(self, preferences: Preferences):
         self.preferences = preferences
         self.session = requests.Session()
+        self.session.mount('http://', CacheControlAdapter())
         self.session.mount('https://', CacheControlAdapter())
-        self.session.headers.update(self._construct_headers())
+        self.session.headers.update(self._headers)
 
-    def _construct_headers(self) -> dict:
+    @property
+    def _headers(self) -> dict:
         return {
             'X-Auth-Email': self.preferences.mail,
             'X-Auth-Key': self.preferences.key,
@@ -45,11 +48,10 @@ class Cloudflare:
                     path: str,
                     method: str = 'GET',
                     data=None) -> json:
-        tmp_headers = self._construct_headers()
-        if self.session.headers != tmp_headers:
-            self.session.headers.update(tmp_headers)
         url = CLOUDFLARE_BASE_URL.format(path)
-        req = self.session.request(method, url, data=data)
+        req = self.session.request(method, url,
+                                   json=data,
+                                   headers=self._headers)
         req.encoding = 'utf-8'
         res = json.loads(req.text)
 
@@ -93,4 +95,4 @@ class Cloudflare:
             'proxied': self.preferences.use_proxy
         }
         path = f"zones/{self.zone}/dns_records/{self.identifier}"
-        self._do_request(path, method='POST', data=data)
+        self._do_request(path, method='PUT', data=data)
