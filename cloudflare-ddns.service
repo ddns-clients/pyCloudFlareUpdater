@@ -1,0 +1,24 @@
+[Unit]
+Description=Cloudflare DDNS (Dynamic DNS) client
+Documentation=https://ddns-clients.github.io/pyCloudFlareUpdater/
+StartLimitBurst=3
+StartLimitIntervalSec=60
+After=network-online.target firewalld.service
+Wants=network-online.target
+
+[Service]
+Type=forking
+ExecStart=/usr/local/bin/cloudflare-ddns
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=process
+TimeoutSec=10
+RestartSec=10
+Restart=always
+PIDFile=/run/cloudflare-ddns.pid
+Environment="KEYRING_CRYPTPASSWD=SECRET_SECURE_PASSWORD_TO_USE-CHANGE"
+#User=
+#Group=
+
+
+[Install]
+WantedBy=multi-user.agent

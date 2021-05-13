@@ -105,7 +105,7 @@ class Preferences:
             log_file or "/var/log/cloudflare-ddns.log" if uid == 0 \
                 else f"{home}/log/cloudflare-ddns.log"
         pid_file = \
-            pid_file or "/var/run/cloudflare-ddns.pid" if uid == 0 \
+            pid_file or "/run/cloudflare-ddns.pid" if uid == 0 \
                 else f"{home}/.cache/cloudflare-ddns.pid"
 
         log_file_dir = os.path.dirname(log_file)

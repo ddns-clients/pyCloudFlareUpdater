@@ -244,8 +244,7 @@ async def parser():
             files_preserve=fds,
             signal_map={
                 signal.SIGTERM: handle_sigterm,
-                signal.SIGHUP: handle_sigterm,
-                signal.SIGUSR1: lambda *_:
+                signal.SIGHUP: lambda *_:
                 log.warning('Reloading preferences!') and preferences.reload()
             },
             uid=uid,

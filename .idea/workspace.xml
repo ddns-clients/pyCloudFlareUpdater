@@ -3,28 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="preferences: add record type and TTL options&#10;&#10;With these new settings available, the sysadmin has more options available for customizing and configuring multiple service instances running with different domains/records">
       <change afterPath="$PROJECT_DIR$/cloudflare-ddns.service" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/.buildinfo" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/.nojekyll" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_sources/index.rst.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/alabaster.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/basic.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/custom.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/doctools.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/documentation_options.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/file.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/jquery.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/language_data.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/minus.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/plus.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/pygments.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/searchtools.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/_static/underscore.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/genindex.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/objects.inv" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/search.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docs/html/searchindex.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/conf.py" beforeDir="false" afterPath="$PROJECT_DIR$/source/conf.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/cloudflare-ddns@user.service" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" beforeDir="false" afterPath="$PROJECT_DIR$/pyCloudflareUpdater/preferences/daemon_preferences.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -96,7 +78,7 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/entrypoint.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -104,6 +86,11 @@
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="settings.editor.selected.configurable" value="Errors" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$" />
+    </key>
   </component>
   <component name="RunManager" selected="Python.pyCloudflareUpdater - profile">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
@@ -194,7 +181,7 @@
       <workItem from="1620458029158" duration="14460000" />
       <workItem from="1620482440604" duration="20657000" />
       <workItem from="1620720264727" duration="22176000" />
-      <workItem from="1620905962093" duration="1408000" />
+      <workItem from="1620905962093" duration="2842000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -399,7 +386,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620907381622</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="sphinx: added docs">
+      <created>1620907531642</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1620907531642</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
