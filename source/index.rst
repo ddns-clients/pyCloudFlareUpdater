@@ -6,6 +6,8 @@
 Welcome to pyCloudflareUpdater's documentation!
 ===============================================
 
+.. include:: ../README.rst
+
 .. automodule:: pyCloudflareUpdater
    :members:
    :imported-members:
