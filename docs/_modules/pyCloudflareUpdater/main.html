@@ -1,0 +1,374 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pyCloudflareUpdater.main &#8212; pyCloudflareUpdater 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyCloudflareUpdater.main</h1><div class="highlight"><pre>
+<span></span><span class="c1">#                             pyCloudflareUpdater</span>
+<span class="c1">#                  Copyright (C) 2021 - Javinator9889</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#      the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#                   (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#       This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#       but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
+<span class="c1">#               GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#     You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="kn">from</span> <span class="nn">logging.handlers</span> <span class="k">import</span> <span class="n">RotatingFileHandler</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span> <span class="nn">logging</span> <span class="k">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">getLevelName</span>
+<span class="kn">from</span> <span class="nn">argparse</span> <span class="k">import</span> <span class="n">ArgumentParser</span>
+<span class="kn">from</span> <span class="nn">colorama</span> <span class="k">import</span> <span class="n">Back</span><span class="p">,</span> <span class="n">Style</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">pwd</span> <span class="k">import</span> <span class="n">getpwnam</span>
+<span class="kn">from</span> <span class="nn">grp</span> <span class="k">import</span> <span class="n">getgrnam</span>
+<span class="kn">from</span> <span class="nn">.logging_utils</span> <span class="k">import</span> <span class="n">init_logging</span>
+<span class="kn">from</span> <span class="nn">.preferences</span> <span class="k">import</span> <span class="n">Preferences</span>
+<span class="kn">from</span> <span class="nn">.network</span> <span class="k">import</span> <span class="n">Cloudflare</span><span class="p">,</span> <span class="n">get_machine_public_ip</span>
+<span class="kn">from</span> <span class="nn">.utils</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">DESCRIPTION</span><span class="p">,</span> <span class="n">PROJECT_URL</span><span class="p">,</span> <span class="n">DEVELOPER_MAIL</span><span class="p">,</span>
+    <span class="n">VALID_RECORD_TYPES</span><span class="p">,</span> <span class="n">VALID_LOGGING_LEVELS</span>
+<span class="p">)</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">daemon</span>
+<span class="kn">import</span> <span class="nn">daemon.pidfile</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">signal</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">asyncio</span>
+
+
+<div class="viewcode-block" id="launch"><a class="viewcode-back" href="../../index.html#pyCloudflareUpdater.launch">[docs]</a><span class="k">def</span> <span class="nf">launch</span><span class="p">(</span><span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Awaitable</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">routine</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">routine</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../index.html#pyCloudflareUpdater.main">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">preferences</span><span class="p">:</span> <span class="n">Preferences</span><span class="p">,</span>
+               <span class="n">log</span><span class="p">:</span> <span class="n">Logger</span><span class="p">,</span>
+               <span class="n">single_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+    <span class="n">continue_running</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing Cloudflare instance&#39;</span><span class="p">)</span>
+        <span class="n">cloudflare</span> <span class="o">=</span> <span class="n">Cloudflare</span><span class="p">(</span><span class="n">preferences</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">continue_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">latest_ip</span> <span class="o">=</span> <span class="n">cloudflare</span><span class="o">.</span><span class="n">ip</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Cloudflare</span><span class="se">\&#39;</span><span class="s1">s IP: </span><span class="si">{latest_ip}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">current_ip</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_machine_public_ip</span><span class="p">()</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Current machine IP: </span><span class="si">{current_ip}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">current_ip</span> <span class="o">!=</span> <span class="n">latest_ip</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;IP changed! </span><span class="si">{latest_ip}</span><span class="s1"> -&gt; </span><span class="si">{current_ip}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">cloudflare</span><span class="o">.</span><span class="n">ip</span> <span class="o">=</span> <span class="n">current_ip</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Correctly updated Cloudflare</span><span class="se">\&#39;</span><span class="s1">s DNS IP&#39;</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">socket</span><span class="o">.</span><span class="n">gaierror</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;DNS name resolution failure! Check settings&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">requests</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">HTTPError</span> <span class="k">as</span> <span class="n">httperr</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s1">&#39;HTTP error when accessing &#39;</span>
+                             <span class="n">f</span><span class="s1">&#39;</span><span class="si">{httperr.request}</span><span class="s1">!</span><span class="se">\n</span><span class="si">{httperr}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">single_run</span><span class="p">:</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;User requested single run. Exiting...&#39;</span><span class="p">)</span>
+                    <span class="k">break</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">preferences</span><span class="o">.</span><span class="n">frequency</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Received SIGINT - exiting...&quot;</span><span class="p">)</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">130</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unexpected exception registered! &quot;{str(e)}&quot;&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Please, submit the following traceback at </span><span class="si">{PROJECT_URL}</span><span class="s1"> &#39;</span>
+                  <span class="n">f</span><span class="s1">&#39;or email it at </span><span class="si">{DEVELOPER_MAIL}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;Stacktrace:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                  <span class="n">f</span><span class="s2">&quot;{traceback.format_exc()}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                  <span class="s2">&quot;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&quot;</span><span class="p">)</span>
+        <span class="n">exit_code</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">preferences</span><span class="o">.</span><span class="n">save_async</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">exit_code</span></div>
+
+
+<div class="viewcode-block" id="parser"><a class="viewcode-back" href="../../index.html#pyCloudflareUpdater.parser">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">parser</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Entrypoint for the Cloudflare&#39;s client. This function parses the</span>
+<span class="sd">    provided command line arguments and launches the daemon. This function</span>
+<span class="sd">    is ``async`` which means it must be called from :mod:`asyncio`. In other</span>
+<span class="sd">    case, calling ``parser()`` will return an :class:`Awaitable`.</span>
+
+<span class="sd">    When running this method, the flow is the following:</span>
+<span class="sd">     1. The arguments, if any, are parsed.</span>
+<span class="sd">     2. Then, :func:`~Preferences.create_from_args` is called with the</span>
+<span class="sd">        provided arguments. If no args are given, then the configuration file is</span>
+<span class="sd">        read. If no configuration file exists, the function will fail and the</span>
+<span class="sd">        missing key will be printed.</span>
+<span class="sd">     3. The logging file will be initialized and starts logging messages.</span>
+<span class="sd">     4. The daemon&#39;s lock file will be then initialized and created.</span>
+<span class="sd">     5. The daemon&#39;s context is initialized with the provided configuration.</span>
+<span class="sd">        Signal listeners are attached.</span>
+<span class="sd">     6. The application forks and starts running in background as a daemon.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="s1">&#39;cloudflare-ddns&#39;</span><span class="p">,</span>
+                          <span class="n">description</span><span class="o">=</span><span class="n">DESCRIPTION</span><span class="p">,</span>
+                          <span class="n">allow_abbrev</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--domain&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Cloudflare domain to be updated.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--name&quot;</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;RECORD NAME&#39;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Cloudflare Record&#39;s name to update.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--type&quot;</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;RECORD TYPE&quot;</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Cloudflare Record&#39;s type to update. &quot;</span>
+                           <span class="s2">&quot;Defaults to &#39;A&#39;&quot;</span><span class="p">,</span>
+                      <span class="n">choices</span><span class="o">=</span><span class="nb">sorted</span><span class="p">(</span><span class="n">VALID_RECORD_TYPES</span><span class="p">))</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--ttl&quot;</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;DNS record&#39;s TTL (Time To Live) value. Defaults &quot;</span>
+                           <span class="s2">&quot;to &#39;1&#39; (automatic)&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--time&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Time (in minutes) to check for updated IP &quot;</span>
+                           <span class="s2">&quot;(defaults: 5 min.) - must be higher than 0.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--key&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;API-KEY&#39;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Cloudflare API key.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--mail&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Cloudflare sign-in mail.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--proxied&quot;</span><span class="p">,</span>
+                      <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set this value if you want your &#39;A&#39; Record to be &quot;</span>
+                           <span class="s2">&quot;behind the Cloudflare proxy &quot;</span>
+                           <span class="s2">&quot;(disabled by default).&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--no-daemonize&quot;</span><span class="p">,</span>
+                      <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;By default, the program runs as a daemon in &quot;</span>
+                           <span class="s2">&quot;background. With this option enabled, &quot;</span>
+                           <span class="s2">&quot;the program will run only once and then exit.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--init-config&quot;</span><span class="p">,</span>
+                      <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Creates the configuration file at the specific &quot;</span>
+                           <span class="s2">&quot;location with no contents but the keys with no&quot;</span>
+                           <span class="s2">&quot;values (ready to be full-filled). When this &quot;</span>
+                           <span class="s2">&quot;option is set, the program creates the file and &quot;</span>
+                           <span class="s2">&quot;exits.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config-file&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="n">f</span><span class="s2">&quot;{Path.home()}/.config/cloudflare-ddns.ini&quot;</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;PATH&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Defines the daemon&#39;s config file location. &quot;</span>
+                           <span class="s2">&quot;Defaults to: </span><span class="se">\&quot;</span><span class="s2">~/.config/cloudflare-ddns.ini</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--pid-file&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;LOCATION&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specifies a custom PID file for storing current &quot;</span>
+                           <span class="s2">&quot;daemon PID.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--log-file&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;LOCATION&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specifies a custom LOG file for storing current &quot;</span>
+                           <span class="s2">&quot;daemon logs.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--log-level&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="s2">&quot;WARNING&quot;</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;LEVEL&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Specifies the proper log level to use when &quot;</span>
+                           <span class="s2">&quot;running. Must be one of: DEBUG, WARN, INFO,&quot;</span>
+                           <span class="s2">&quot;CRITICAL, ERROR, FATAL, logging.NOTSET&quot;</span><span class="p">,</span>
+                      <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="n">getLevelName</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span> <span class="k">for</span> <span class="n">lvl</span> <span class="ow">in</span>
+                               <span class="n">VALID_LOGGING_LEVELS</span><span class="p">])</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--console-log&quot;</span><span class="p">,</span>
+                      <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Enables logging to both console and file. &quot;</span>
+                           <span class="s2">&quot;Intended for debugging purposes. Disabled by &quot;</span>
+                           <span class="s2">&quot;default.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--user&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;USERNAME&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run the daemon as the specified user.&quot;</span><span class="p">)</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--group&quot;</span><span class="p">,</span>
+                      <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                      <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                      <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;GROUP-NAME&quot;</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run the daemon as the specified group.&quot;</span><span class="p">)</span>
+    <span class="n">p_args</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">Preferences</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">p_args</span><span class="o">.</span><span class="n">config_file</span>
+        <span class="k">if</span> <span class="n">p_args</span><span class="o">.</span><span class="n">init_config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="k">await</span> <span class="n">Preferences</span><span class="o">.</span><span class="n">create_empty_file</span><span class="p">():</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Created configuration file at &quot;</span><span class="si">{Preferences.file}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;File already exists! Not doing anything...&#39;</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">preferences</span> <span class="o">=</span> <span class="k">await</span> <span class="n">Preferences</span><span class="o">.</span><span class="n">create_from_args</span><span class="p">(</span><span class="n">p_args</span><span class="p">)</span>
+
+        <span class="n">log</span> <span class="o">=</span> <span class="n">init_logging</span><span class="p">(</span><span class="n">log_file</span><span class="o">=</span><span class="n">preferences</span><span class="o">.</span><span class="n">logging_file</span><span class="p">,</span>
+                           <span class="n">file_level</span><span class="o">=</span><span class="n">preferences</span><span class="o">.</span><span class="n">logging_level</span><span class="p">,</span>
+                           <span class="n">console_level</span><span class="o">=</span><span class="n">preferences</span><span class="o">.</span><span class="n">logging_level</span><span class="p">,</span>
+                           <span class="n">log_to_console</span><span class="o">=</span><span class="n">p_args</span><span class="o">.</span><span class="n">console_log</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Logger initialized&#39;</span><span class="p">)</span>
+
+        <span class="n">fds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">handler</span><span class="p">,</span> <span class="n">RotatingFileHandler</span><span class="p">):</span>
+                <span class="n">fds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="o">.</span><span class="n">stream</span><span class="o">.</span><span class="n">fileno</span><span class="p">())</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Saving logger file descriptor for avoiding closing it&#39;</span><span class="p">)</span>
+
+        <span class="n">uid</span> <span class="o">=</span> <span class="n">getpwnam</span><span class="p">(</span><span class="n">p_args</span><span class="o">.</span><span class="n">user</span><span class="p">)</span> <span class="k">if</span> <span class="n">p_args</span><span class="o">.</span><span class="n">user</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">gid</span> <span class="o">=</span> <span class="n">getgrnam</span><span class="p">(</span><span class="n">p_args</span><span class="o">.</span><span class="n">group</span><span class="p">)</span> <span class="k">if</span> <span class="n">p_args</span><span class="o">.</span><span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Running daemon as </span><span class="si">{uid}</span><span class="s1">:</span><span class="si">{gid}</span><span class="s1"> (UID:GID)&#39;</span><span class="p">)</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Creating locked PID file at </span><span class="si">{preferences.pid_file}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">pid_file</span> <span class="o">=</span> <span class="n">daemon</span><span class="o">.</span><span class="n">pidfile</span><span class="o">.</span><span class="n">PIDLockFile</span><span class="p">(</span><span class="n">preferences</span><span class="o">.</span><span class="n">pid_file</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">handle_sigterm</span><span class="p">(</span><span class="o">*</span><span class="n">_</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;SIGTERM received! Finishing...&#39;</span><span class="p">)</span>
+                <span class="n">preferences</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Cloudflare DDNS finished correctly&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">handlers</span><span class="p">:</span>
+                    <span class="n">handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;Unable to finish correctly! - </span><span class="si">{e}</span><span class="s1">&#39;</span><span class="p">,</span>
+                          <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="n">pid_file</span><span class="o">.</span><span class="n">break_lock</span><span class="p">()</span>
+
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Initializing daemon context&#39;</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">daemon</span><span class="o">.</span><span class="n">DaemonContext</span><span class="p">(</span>
+            <span class="n">working_directory</span><span class="o">=</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">(),</span>
+            <span class="n">umask</span><span class="o">=</span><span class="mo">0o002</span><span class="p">,</span>
+            <span class="n">pidfile</span><span class="o">=</span><span class="n">pid_file</span><span class="p">,</span>
+            <span class="n">files_preserve</span><span class="o">=</span><span class="n">fds</span><span class="p">,</span>
+            <span class="n">signal_map</span><span class="o">=</span><span class="p">{</span>
+                <span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">:</span> <span class="n">handle_sigterm</span><span class="p">,</span>
+                <span class="n">signal</span><span class="o">.</span><span class="n">SIGHUP</span><span class="p">:</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">_</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Reloading preferences!&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">preferences</span><span class="o">.</span><span class="n">reload</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="n">uid</span><span class="o">=</span><span class="n">uid</span><span class="p">,</span>
+            <span class="n">gid</span><span class="o">=</span><span class="n">gid</span>
+        <span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Forking daemon. Future logs available at: &#39;</span>
+                 <span class="n">f</span><span class="s1">&#39;</span><span class="si">{preferences.logging_file}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">context</span><span class="p">:</span>
+            <span class="n">exit</span><span class="p">(</span><span class="n">launch</span><span class="p">(</span><span class="n">main</span><span class="p">,</span> <span class="n">preferences</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">single_run</span><span class="o">=</span><span class="n">p_args</span><span class="o">.</span><span class="n">no_daemonize</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">fatal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">),</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">NameError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;</span><span class="si">{Back.RED}</span><span class="s2">Error: {str(err)}</span><span class="si">{Style.RESET_ALL}</span><span class="s2">&quot;</span><span class="p">,</span>
+                  <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../index.html">pyCloudflareUpdater</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Javinator9889.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

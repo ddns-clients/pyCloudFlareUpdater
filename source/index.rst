@@ -6,6 +6,12 @@
 Welcome to pyCloudflareUpdater's documentation!
 ===============================================
 
+.. automodule:: pyCloudflareUpdater
+   :members:
+   :imported-members:
+   :undoc-members:
+   :show-inheritance:
+
 .. toctree::
    :maxdepth: 2
    :caption: Contents:

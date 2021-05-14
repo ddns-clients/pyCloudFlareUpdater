@@ -12,9 +12,10 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+from pyCloudflareUpdater import VERSION
 
 
 # -- Project information -----------------------------------------------------
@@ -24,9 +25,9 @@ copyright = '2021, Javinator9889'
 author = 'Javinator9889'
 
 # The short X.Y version
-version = '2.0.0'
+version = VERSION
 # The full version, including alpha/beta/rc tags
-release = '2.0.0'
+release = VERSION
 
 
 # -- General configuration ---------------------------------------------------
@@ -45,6 +46,8 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -72,7 +75,7 @@ language = None
 exclude_patterns = []
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'sphinx'
 
 
 # -- Options for HTML output -------------------------------------------------

@@ -29,8 +29,215 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="welcome-to-pycloudflareupdater-s-documentation">
-<h1>Welcome to pyCloudflareUpdater’s documentation!<a class="headerlink" href="#welcome-to-pycloudflareupdater-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-pyCloudflareUpdater">
+<span id="welcome-to-pycloudflareupdater-s-documentation"></span><h1>Welcome to pyCloudflareUpdater’s documentation!<a class="headerlink" href="#module-pyCloudflareUpdater" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="pyCloudflareUpdater.Cloudflare">
+<em class="property">class </em><code class="descclassname">pyCloudflareUpdater.</code><code class="descname">Cloudflare</code><span class="sig-paren">(</span><em>preferences: pyCloudflareUpdater.preferences.daemon_preferences.Preferences</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/network/network_utils.html#Cloudflare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.Cloudflare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Cloudflare.identifier">
+<code class="descname">identifier</code><a class="headerlink" href="#pyCloudflareUpdater.Cloudflare.identifier" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Cloudflare.ip">
+<code class="descname">ip</code><a class="headerlink" href="#pyCloudflareUpdater.Cloudflare.ip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Cloudflare.zone">
+<code class="descname">zone</code><a class="headerlink" href="#pyCloudflareUpdater.Cloudflare.zone" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyCloudflareUpdater.Preferences">
+<em class="property">class </em><code class="descclassname">pyCloudflareUpdater.</code><code class="descname">Preferences</code><a class="reference internal" href="_modules/pyCloudflareUpdater/preferences/daemon_preferences.html#Preferences"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.Preferences" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.9)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="staticmethod">
+<dt id="pyCloudflareUpdater.Preferences.create_empty_file">
+<em class="property">static </em><code class="descname">create_empty_file</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/pyCloudflareUpdater/preferences/daemon_preferences.html#Preferences.create_empty_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.Preferences.create_empty_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="classmethod">
+<dt id="pyCloudflareUpdater.Preferences.create_from_args">
+<em class="property">classmethod </em><code class="descname">create_from_args</code><span class="sig-paren">(</span><em>p_args: argparse.Namespace</em><span class="sig-paren">)</span> &#x2192; pyCloudflareUpdater.preferences.daemon_preferences.Preferences<a class="reference internal" href="_modules/pyCloudflareUpdater/preferences/daemon_preferences.html#Preferences.create_from_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.Preferences.create_from_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.domain">
+<code class="descname">domain</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.domain" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.file">
+<code class="descname">file</code><em class="property"> = '/home/javinator9889/.config/cloudflare-ddns.ini'</em><a class="headerlink" href="#pyCloudflareUpdater.Preferences.file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.frequency">
+<code class="descname">frequency</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.frequency" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.key">
+<code class="descname">key</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.logging_file">
+<code class="descname">logging_file</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.logging_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.logging_level">
+<code class="descname">logging_level</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.logging_level" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.mail">
+<code class="descname">mail</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.mail" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.name">
+<code class="descname">name</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.pid_file">
+<code class="descname">pid_file</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.pid_file" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyCloudflareUpdater.Preferences.reload">
+<code class="descname">reload</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/preferences/daemon_preferences.html#Preferences.reload"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.Preferences.reload" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyCloudflareUpdater.Preferences.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/preferences/daemon_preferences.html#Preferences.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.Preferences.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyCloudflareUpdater.Preferences.save_async">
+<code class="descname">save_async</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/preferences/daemon_preferences.html#Preferences.save_async"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.Preferences.save_async" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.ttl">
+<code class="descname">ttl</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.ttl" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.type">
+<code class="descname">type</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyCloudflareUpdater.Preferences.use_proxy">
+<code class="descname">use_proxy</code><a class="headerlink" href="#pyCloudflareUpdater.Preferences.use_proxy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.cached">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">cached</code><span class="sig-paren">(</span><em>cached_prop: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/utils/cache.html#cached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.cached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.change_permissions">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">change_permissions</code><span class="sig-paren">(</span><em>path: PathT</em>, <em>perms: int</em>, <em>dir_fd=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/utils/stat.html#change_permissions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.change_permissions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.ensure_permissions">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">ensure_permissions</code><span class="sig-paren">(</span><em>path: PathT</em>, <em>perms: int</em>, <em>dir_fd: Optional[int] = None</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/pyCloudflareUpdater/utils/stat.html#ensure_permissions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.ensure_permissions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.get_machine_public_ip">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">get_machine_public_ip</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/network/network_utils.html#get_machine_public_ip"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.get_machine_public_ip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.init_logging">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">init_logging</code><span class="sig-paren">(</span><em>logger_name: Optional[str] = None</em>, <em>log_file: Optional[str] = 'cloudflare-ddns.log'</em>, <em>console_level: int = 10</em>, <em>file_level: int = 10</em>, <em>log_format: str = '%(asctime)s | [%(levelname)s]:\t%(message)s'</em>, <em>log_to_console: bool = False</em><span class="sig-paren">)</span> &#x2192; &lt;module 'logging' from '/usr/lib/python3.8/logging/__init__.py'&gt;<a class="reference internal" href="_modules/pyCloudflareUpdater/logging_utils/utils.html#init_logging"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.init_logging" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a custom logging that outputs to both console and file, if
+filename provided. Automatically cleans-up old logs during runtime and
+allows customization of both console and file levels in addition to the
+formatter.
+:param logger_name: the logger name for later obtaining it.
+:param log_file: a filename for saving the logs during execution - can be</p>
+<blockquote>
+<div><cite>None</cite></div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>console_level</strong> – the logging level for console.</li>
+<li><strong>file_level</strong> – the logging level for the file.</li>
+<li><strong>log_format</strong> – the logging format.</li>
+<li><strong>log_to_console</strong> – whether to log to a console or not.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the created logging instance</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.is_none_or_empty">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">is_none_or_empty</code><span class="sig-paren">(</span><em>s: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="_modules/pyCloudflareUpdater/utils/str.html#is_none_or_empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.is_none_or_empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.launch">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">launch</code><span class="sig-paren">(</span><em>fn: Callable[[...], Awaitable[Any]], *args, **kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/main.html#launch"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.launch" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.main">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">main</code><span class="sig-paren">(</span><em>preferences: pyCloudflareUpdater.preferences.daemon_preferences.Preferences</em>, <em>log: logging.Logger</em>, <em>single_run: bool = False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/main.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.parser">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">parser</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/main.html#parser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.parser" title="Permalink to this definition">¶</a></dt>
+<dd><p>Entrypoint for the Cloudflare’s client. This function parses the
+provided command line arguments and launches the daemon. This function
+is <code class="docutils literal notranslate"><span class="pre">async</span></code> which means it must be called from <a class="reference external" href="https://docs.python.org/3/library/asyncio.html#module-asyncio" title="(in Python v3.9)"><code class="xref py py-mod docutils literal notranslate"><span class="pre">asyncio</span></code></a>. In other
+case, calling <code class="docutils literal notranslate"><span class="pre">parser()</span></code> will return an <code class="xref py py-class docutils literal notranslate"><span class="pre">Awaitable</span></code>.</p>
+<dl class="docutils">
+<dt>When running this method, the flow is the following:</dt>
+<dd><ol class="first last arabic simple">
+<li>The arguments, if any, are parsed.</li>
+<li>Then, <a class="reference internal" href="#pyCloudflareUpdater.Preferences.create_from_args" title="pyCloudflareUpdater.Preferences.create_from_args"><code class="xref py py-func docutils literal notranslate"><span class="pre">create_from_args()</span></code></a> is called with the
+provided arguments. If no args are given, then the configuration file is
+read. If no configuration file exists, the function will fail and the
+missing key will be printed.</li>
+<li>The logging file will be initialized and starts logging messages.</li>
+<li>The daemon’s lock file will be then initialized and created.</li>
+<li>The daemon’s context is initialized with the provided configuration.
+Signal listeners are attached.</li>
+<li>The application forks and starts running in background as a daemon.</li>
+</ol>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyCloudflareUpdater.ucached">
+<code class="descclassname">pyCloudflareUpdater.</code><code class="descname">ucached</code><span class="sig-paren">(</span><em>cached_prop: str</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyCloudflareUpdater/utils/cache.html#ucached"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyCloudflareUpdater.ucached" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <div class="toctree-wrapper compound">
 </div>
 </div>

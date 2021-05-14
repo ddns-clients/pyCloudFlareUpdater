@@ -1,0 +1,187 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>pyCloudflareUpdater.network.network_utils &#8212; pyCloudflareUpdater 2.0.0 documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for pyCloudflareUpdater.network.network_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1">#                             pyCloudflareUpdater</span>
+<span class="c1">#                  Copyright (C) 2019 - Javinator9889</span>
+<span class="c1">#</span>
+<span class="c1">#    This program is free software: you can redistribute it and/or modify</span>
+<span class="c1">#    it under the terms of the GNU General Public License as published by</span>
+<span class="c1">#      the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1">#                   (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1">#       This program is distributed in the hope that it will be useful,</span>
+<span class="c1">#       but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1">#        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</span>
+<span class="c1">#               GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1">#     You should have received a copy of the GNU General Public License</span>
+<span class="c1">#    along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">ujson</span> <span class="k">as</span> <span class="nn">json</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">from</span> <span class="nn">cachecontrol</span> <span class="k">import</span> <span class="n">CacheControlAdapter</span>
+<span class="kn">from</span> <span class="nn">..preferences</span> <span class="k">import</span> <span class="n">Preferences</span>
+<span class="kn">from</span> <span class="nn">..utils</span> <span class="k">import</span> <span class="n">CLOUDFLARE_BASE_URL</span>
+
+
+<div class="viewcode-block" id="get_machine_public_ip"><a class="viewcode-back" href="../../../index.html#pyCloudflareUpdater.get_machine_public_ip">[docs]</a><span class="k">async</span> <span class="k">def</span> <span class="nf">get_machine_public_ip</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;https://ident.me/&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span></div>
+
+
+<div class="viewcode-block" id="Cloudflare"><a class="viewcode-back" href="../../../index.html#pyCloudflareUpdater.Cloudflare">[docs]</a><span class="k">class</span> <span class="nc">Cloudflare</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">preferences</span><span class="p">:</span> <span class="n">Preferences</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span> <span class="o">=</span> <span class="n">preferences</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;http://&#39;</span><span class="p">,</span> <span class="n">CacheControlAdapter</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s1">&#39;https://&#39;</span><span class="p">,</span> <span class="n">CacheControlAdapter</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s1">&#39;X-Auth-Email&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">mail</span><span class="p">,</span>
+            <span class="s1">&#39;X-Auth-Key&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">key</span><span class="p">,</span>
+            <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_do_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;GET&#39;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">json</span><span class="p">:</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">CLOUDFLARE_BASE_URL</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span>
+                                   <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+                                   <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">)</span>
+        <span class="n">req</span><span class="o">.</span><span class="n">encoding</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">req</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">304</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;success&#39;</span><span class="p">]:</span>
+            <span class="n">error_json</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;errors&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;(</span><span class="si">{error_json[&#39;code&#39;]}</span><span class="s2">) </span><span class="si">{error_json[&#39;message&#39;]}</span><span class="s2">&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;error_chain&#39;</span> <span class="ow">in</span> <span class="n">error_json</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">error_json</span><span class="p">[</span><span class="s1">&#39;error_chain&#39;</span><span class="p">]:</span>
+                    <span class="n">error_msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">- (</span><span class="si">{error[&#39;code&#39;]}</span><span class="s2">) </span><span class="si">{error[&#39;message&#39;]}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">requests</span><span class="o">.</span><span class="n">HTTPError</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">error_msg</span><span class="p">),</span>
+                                     <span class="n">request</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                                     <span class="n">response</span><span class="o">=</span><span class="n">error_json</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;result&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">zone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;zones?name=</span><span class="si">{self.preferences.name}</span><span class="s2">&quot;</span> \
+               <span class="n">f</span><span class="s2">&quot;&amp;status=active&amp;page=1&amp;per_page=1&amp;match=all&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;zones/</span><span class="si">{self.zone}</span><span class="s2">/dns_records?type=A&quot;</span> \
+               <span class="n">f</span><span class="s2">&quot;&amp;name=</span><span class="si">{self.preferences.name}</span><span class="s2">&amp;page=1&amp;per_page=1&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ip</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;zones/</span><span class="si">{self.zone}</span><span class="s2">/dns_records/</span><span class="si">{self.identifier}</span><span class="s2">&quot;</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;content&#39;</span><span class="p">]</span>
+
+    <span class="nd">@ip</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_ip</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;A&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s1">&#39;content&#39;</span><span class="p">:</span> <span class="n">new_ip</span><span class="p">,</span>
+            <span class="s1">&#39;ttl&#39;</span><span class="p">:</span> <span class="mi">600</span><span class="p">,</span>
+            <span class="s1">&#39;proxied&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">preferences</span><span class="o">.</span><span class="n">use_proxy</span>
+        <span class="p">}</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;zones/</span><span class="si">{self.zone}</span><span class="s2">/dns_records/</span><span class="si">{self.identifier}</span><span class="s2">&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_do_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;PUT&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../../../index.html">pyCloudflareUpdater</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Javinator9889.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.8.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

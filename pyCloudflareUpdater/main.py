@@ -25,7 +25,7 @@ from .logging_utils import init_logging
 from .preferences import Preferences
 from .network import Cloudflare, get_machine_public_ip
 from .utils import (
-    DESCRIPTION, LOGGER_NAME, PROJECT_URL, DEVELOPER_MAIL,
+    DESCRIPTION, PROJECT_URL, DEVELOPER_MAIL,
     VALID_RECORD_TYPES, VALID_LOGGING_LEVELS
 )
 import sys
@@ -40,7 +40,7 @@ import asyncio
 
 def launch(fn: Callable[..., Awaitable[Any]], *args, **kwargs):
     routine = fn(*args, **kwargs)
-    asyncio.run(routine)
+    return asyncio.run(routine)
 
 
 async def main(preferences: Preferences,
@@ -60,6 +60,7 @@ async def main(preferences: Preferences,
                 if current_ip != latest_ip:
                     log.warning(f'IP changed! {latest_ip} -> {current_ip}')
                     cloudflare.ip = current_ip
+                    log.info('Correctly updated Cloudflare\'s DNS IP')
 
             except socket.gaierror:
                 log.warning('DNS name resolution failure! Check settings')
@@ -84,10 +85,28 @@ async def main(preferences: Preferences,
         exit_code = 1
     finally:
         await preferences.save_async()
-        exit(exit_code)
+        return exit_code
 
 
 async def parser():
+    """
+    Entrypoint for the Cloudflare's client. This function parses the
+    provided command line arguments and launches the daemon. This function
+    is ``async`` which means it must be called from :mod:`asyncio`. In other
+    case, calling ``parser()`` will return an :class:`Awaitable`.
+
+    When running this method, the flow is the following:
+     1. The arguments, if any, are parsed.
+     2. Then, :func:`~Preferences.create_from_args` is called with the
+        provided arguments. If no args are given, then the configuration file is
+        read. If no configuration file exists, the function will fail and the
+        missing key will be printed.
+     3. The logging file will be initialized and starts logging messages.
+     4. The daemon's lock file will be then initialized and created.
+     5. The daemon's context is initialized with the provided configuration.
+        Signal listeners are attached.
+     6. The application forks and starts running in background as a daemon.
+    """
     args = ArgumentParser(prog='cloudflare-ddns',
                           description=DESCRIPTION,
                           allow_abbrev=False)
@@ -250,14 +269,14 @@ async def parser():
             uid=uid,
             gid=gid
         )
-        log.debug('Launching main application from daemon\'s context. '
-                  'Console logs will no longer be available')
+        log.info('Forking daemon. Future logs available at: '
+                 f'{preferences.logging_file}')
 
         with context:
-            launch(main, preferences, log, single_run=p_args.no_daemonize)
+            exit(launch(main, preferences, log, single_run=p_args.no_daemonize))
     except Exception as err:
         try:
-            log.fatal(str(err))
+            log.fatal(str(err), exc_info=True)
         except NameError:
             pass
         finally:

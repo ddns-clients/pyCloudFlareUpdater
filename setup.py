@@ -26,7 +26,7 @@ setup(
     description='DDNS service for dynamically update Cloudflare DNS Records',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    include_package_data=False,
+    include_package_data=True,
     zip_safe=True,
     download_url="https://github.com/ddns-clients/pyCloudFlareUpdater/archive/refs/heads/master.zip",
     entry_points={

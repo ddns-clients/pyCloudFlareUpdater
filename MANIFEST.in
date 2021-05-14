@@ -1,0 +1,4 @@
+include README.md
+include docs/*.txt
+include cloudflare-ddns.service
+include cloudflare-ddns@user.service
