@@ -39,41 +39,38 @@ async def init_crypto():
         from cryptography.hazmat.primitives import hashes
 
         _kr = CryptFileKeyring()
-        _key = os.getenv('KEYRING_CRYPTPASSWD')
+        _key = os.getenv("KEYRING_CRYPTPASSWD")
         if _key is None:
-            raise AttributeError(
-                'Missing environment variable "KEYRING_CRYPTPASSWD"!')
+            raise AttributeError('Missing environment variable "KEYRING_CRYPTPASSWD"!')
         _kr.keyring_key = _key
         keyring.set_keyring(_kr)
         _keyring.set()
 
         _kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA512(),
-            length=64,
-            salt=os.urandom(32),
-            iterations=100000
+            algorithm=hashes.SHA512(), length=64, salt=os.urandom(32), iterations=100000
         )
         _kdf_event.set()
 
 
-async def save_to_kr(identifier: str,
-                     password: Union[str, bytes],
-                     service: str = 'system'):
+async def save_to_kr(
+    identifier: str, password: Union[str, bytes], service: str = "system"
+):
     if not _init_called:
-        raise ValueError('"init_crypto" must be called before "save_to_kr" '
-                         'invocation')
+        raise ValueError(
+            '"init_crypto" must be called before "save_to_kr" ' "invocation"
+        )
     await _keyring.wait()
     if isinstance(password, str):
-        password = password.encode('ascii')
-    password = base64.b64encode(password).decode('ascii')
+        password = password.encode("ascii")
+    password = base64.b64encode(password).decode("ascii")
     keyring.set_password(service, identifier, password)
 
 
-async def read_from_kr(identifier: str,
-                       service: str = 'system') -> Optional[bytes]:
+async def read_from_kr(identifier: str, service: str = "system") -> Optional[bytes]:
     if not _init_called:
-        raise ValueError('"init_crypto" must be called before "read_from_kr" '
-                         'invocation')
+        raise ValueError(
+            '"init_crypto" must be called before "read_from_kr" ' "invocation"
+        )
     await _keyring.wait()
     b64passwd = keyring.get_password(service, identifier)
     if b64passwd is None:
@@ -83,8 +80,7 @@ async def read_from_kr(identifier: str,
 
 async def gen_key() -> bytes:
     if not _init_called:
-        raise ValueError('"init_crypto" must be called before "gen_key" '
-                         'invocation')
+        raise ValueError('"init_crypto" must be called before "gen_key" ' "invocation")
     await _kdf_event.wait()
     return base64.urlsafe_b64encode(_kdf.derive(os.urandom(32)))
 
@@ -105,6 +101,7 @@ def decrypt(token: bytes, key: bytes) -> bytes:
 
 def is_valid_token(token: bytes, key: bytes) -> bool:
     from cryptography.fernet import InvalidToken
+
     try:
         decrypt(token, key)
         return True

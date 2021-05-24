@@ -25,74 +25,72 @@ from ..utils import CLOUDFLARE_BASE_URL
 
 
 async def get_machine_public_ip():
-    return requests.get('https://ident.me/').text
+    return requests.get("https://ident.me/").text
 
 
 class Cloudflare:
     def __init__(self, preferences: Preferences):
         self.preferences = preferences
         self.session = requests.Session()
-        self.session.mount('http://', CacheControlAdapter())
-        self.session.mount('https://', CacheControlAdapter())
+        self.session.mount("http://", CacheControlAdapter())
+        self.session.mount("https://", CacheControlAdapter())
         self.session.headers.update(self._headers)
 
     @property
     def _headers(self) -> dict:
         return {
-            'X-Auth-Email': self.preferences.mail,
-            'X-Auth-Key': self.preferences.key,
-            'Content-Type': 'application/json'
+            "X-Auth-Email": self.preferences.mail,
+            "X-Auth-Key": self.preferences.key,
+            "Content-Type": "application/json",
         }
 
-    def _do_request(self,
-                    path: str,
-                    method: str = 'GET',
-                    data=None) -> json:
+    def _do_request(self, path: str, method: str = "GET", data=None) -> json:
         url = CLOUDFLARE_BASE_URL.format(path)
-        req = self.session.request(method, url,
-                                   json=data,
-                                   headers=self._headers)
-        req.encoding = 'utf-8'
+        req = self.session.request(method, url, json=data, headers=self._headers)
+        req.encoding = "utf-8"
         res = json.loads(req.text)
 
-        if req.status_code >= 304 or not res['success']:
-            error_json = res['errors'][0]
+        if req.status_code >= 304 or not res["success"]:
+            error_json = res["errors"][0]
             error_msg = [f"({error_json['code']}) {error_json['message']}"]
-            if 'error_chain' in error_json:
-                for error in error_json['error_chain']:
-                    error_msg.append(
-                        f"\t- ({error['code']}) {error['message']}")
-            raise requests.HTTPError('\n'.join(error_msg),
-                                     request=url,
-                                     response=error_json)
-        return res['result']
+            if "error_chain" in error_json:
+                for error in error_json["error_chain"]:
+                    error_msg.append(f"\t- ({error['code']}) {error['message']}")
+            raise requests.HTTPError(
+                "\n".join(error_msg), request=url, response=error_json
+            )
+        return res["result"]
 
     @property
     def zone(self) -> str:
-        path = f"zones?name={self.preferences.name}" \
-               f"&status=active&page=1&per_page=1&match=all"
-        return self._do_request(path)[0]['id']
+        path = (
+            f"zones?name={self.preferences.name}"
+            f"&status=active&page=1&per_page=1&match=all"
+        )
+        return self._do_request(path)[0]["id"]
 
     @property
     def identifier(self) -> str:
-        path = f"zones/{self.zone}/dns_records?type=A" \
-               f"&name={self.preferences.name}&page=1&per_page=1"
-        return self._do_request(path)[0]['id']
+        path = (
+            f"zones/{self.zone}/dns_records?type=A"
+            f"&name={self.preferences.name}&page=1&per_page=1"
+        )
+        return self._do_request(path)[0]["id"]
 
     @property
     def ip(self) -> str:
         path = f"zones/{self.zone}/dns_records/{self.identifier}"
         r = self._do_request(path)
-        return r['content']
+        return r["content"]
 
     @ip.setter
     def ip(self, new_ip: str):
         data = {
-            'type': 'A',
-            'name': self.preferences.name,
-            'content': new_ip,
-            'ttl': 600,
-            'proxied': self.preferences.use_proxy
+            "type": "A",
+            "name": self.preferences.name,
+            "content": new_ip,
+            "ttl": 600,
+            "proxied": self.preferences.use_proxy,
         }
         path = f"zones/{self.zone}/dns_records/{self.identifier}"
-        self._do_request(path, method='PUT', data=data)
+        self._do_request(path, method="PUT", data=data)

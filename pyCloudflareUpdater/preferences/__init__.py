@@ -15,6 +15,11 @@
 #    along with this program. If not, see <http://www.gnu.org/licenses/>.
 from .daemon_preferences import Preferences
 from .crypt import (
-    save_to_kr, read_from_kr, gen_key, encrypt, decrypt,
-    is_valid_token, init_crypto
+    save_to_kr,
+    read_from_kr,
+    gen_key,
+    encrypt,
+    decrypt,
+    is_valid_token,
+    init_crypto,
 )

@@ -17,6 +17,6 @@ import asyncio
 from . import main
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     routine = main.parser()
     asyncio.run(routine, debug=True)

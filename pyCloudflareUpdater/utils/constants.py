@@ -16,35 +16,58 @@
 from logging import DEBUG, INFO, WARNING
 import logging
 
-VERSION = '2.0.0'
+VERSION = "2.0.0"
 VERSION_CODE = 200
-VERSION_NAME = 'Reborn'
+VERSION_NAME = "Reborn"
 DESCRIPTION = f"""pyCloudflareUpdater (cloudflare-ddns) - "{VERSION_NAME}" v{VERSION} ({VERSION_CODE})
  — A DDNS (Dynamic DNS) client that periodically updates Cloudflare's DNS 
 records when IP address changes"""
 PROJECT_URL = "https://github.com/ddns-clients/pyCloudFlareUpdater"
-DEVELOPER_MAIL = 'dev@javinator9889.com'
+DEVELOPER_MAIL = "dev@javinator9889.com"
 
 # Cloudflare data
 CLOUDFLARE_BASE_URL = "https://api.cloudflare.com/client/v4/{0}"
-VALID_RECORD_TYPES = {'A', 'AAAA', 'CNAME', 'HTTPS', 'TXT', 'SRV', 'LOC', 'MX',
-                      'NS', 'SPF', 'CERT', 'DNSKEY', 'DS', 'NAPTR', 'SMIMEA',
-                      'SSHFP', 'SVCB', 'TLSA', 'URI'}
+VALID_RECORD_TYPES = {
+    "A",
+    "AAAA",
+    "CNAME",
+    "HTTPS",
+    "TXT",
+    "SRV",
+    "LOC",
+    "MX",
+    "NS",
+    "SPF",
+    "CERT",
+    "DNSKEY",
+    "DS",
+    "NAPTR",
+    "SMIMEA",
+    "SSHFP",
+    "SVCB",
+    "TLSA",
+    "URI",
+}
 
 # Logging constants
 LOGGER_NAME = "cloudflare:logger"
 LOG_FILE = "cloudflare-ddns.log"
-LOG_DEFAULT_FORMAT = \
-    "%(asctime)s | [%(levelname)s]:\t%(message)s"
+LOG_DEFAULT_FORMAT = "%(asctime)s | [%(levelname)s]:\t%(message)s"
 PRODUCTION_CONSOLE_LOG_LEVEL = INFO
 PRODUCTION_FILE_LOG_LEVEL = WARNING
 
 DEV_CONSOLE_LOG_LEVEL = DEBUG
 DEV_FILE_LOG_LEVEL = DEBUG
 
-VALID_LOGGING_LEVELS = {logging.DEBUG, logging.WARN, logging.INFO,
-                        logging.CRITICAL, logging.ERROR, logging.FATAL,
-                        logging.NOTSET}
+VALID_LOGGING_LEVELS = {
+    logging.DEBUG,
+    logging.WARN,
+    logging.INFO,
+    logging.CRITICAL,
+    logging.ERROR,
+    logging.FATAL,
+    logging.NOTSET,
+}
 
 # Preferences settings
 DEFAULT_SETTINGS = """[Logging]

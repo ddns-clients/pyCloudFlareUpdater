@@ -30,7 +30,7 @@ from .constants import (
     VALID_RECORD_TYPES,
     VERSION,
     VERSION_CODE,
-    VERSION_NAME
+    VERSION_NAME,
 )
 
 from .stat import ensure_permissions, change_permissions, PathT

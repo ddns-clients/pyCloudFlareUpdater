@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="docs: created initial documentation">
+    <list default="true" id="a5171c67-a1fe-4f40-9dbd-6164d1ecf7e3" name="Default Changelist" comment="README: rst initial commit">
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_8_5_21_9_18_[Default_Changelist]/shelved.patch" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Checkout_at_8_5_21_9_18__Default_Changelist_.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/source/index.rst" beforeDir="false" afterPath="$PROJECT_DIR$/source/index.rst" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +179,8 @@
       <workItem from="1620458029158" duration="14460000" />
       <workItem from="1620482440604" duration="20657000" />
       <workItem from="1620720264727" duration="22176000" />
-      <workItem from="1620905962093" duration="10451000" />
+      <workItem from="1620905962093" duration="10657000" />
+      <workItem from="1621517101173" duration="10000" />
     </task>
     <task id="LOCAL-00001" summary="v2.0: initial commit">
       <created>1620458557740</created>
@@ -418,7 +420,14 @@
       <option name="project" value="LOCAL" />
       <updated>1620985664648</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="README: rst initial commit">
+      <created>1620986988953</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1620986988953</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -437,7 +446,6 @@
     <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="main: changed old Cloudflare to new one" />
     <MESSAGE value="requirements: updated install_requires" />
     <MESSAGE value="refactor: moved &quot;old&quot; name to new one" />
     <MESSAGE value="config: use lowercase variables" />
@@ -462,7 +470,8 @@
     <MESSAGE value="docs: removed unnecessary folder" />
     <MESSAGE value="docs: updated .gitignore" />
     <MESSAGE value="docs: created initial documentation" />
-    <option name="LAST_COMMIT_MESSAGE" value="docs: created initial documentation" />
+    <MESSAGE value="README: rst initial commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="README: rst initial commit" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/pyCloudFlareUpdater$pyCloudflareUpdater.coverage" NAME="pyCloudflareUpdater Coverage Results" MODIFIED="1620673362192" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/pyCloudflareUpdater" />

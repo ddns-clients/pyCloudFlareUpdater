@@ -25,8 +25,11 @@ from .logging_utils import init_logging
 from .preferences import Preferences
 from .network import Cloudflare, get_machine_public_ip
 from .utils import (
-    DESCRIPTION, PROJECT_URL, DEVELOPER_MAIL,
-    VALID_RECORD_TYPES, VALID_LOGGING_LEVELS
+    DESCRIPTION,
+    PROJECT_URL,
+    DEVELOPER_MAIL,
+    VALID_RECORD_TYPES,
+    VALID_LOGGING_LEVELS,
 )
 import sys
 import daemon
@@ -43,33 +46,32 @@ def launch(fn: Callable[..., Awaitable[Any]], *args, **kwargs):
     return asyncio.run(routine)
 
 
-async def main(preferences: Preferences,
-               log: Logger,
-               single_run: bool = False):
+async def main(preferences: Preferences, log: Logger, single_run: bool = False):
     continue_running = True
     exit_code = 0
     try:
-        log.debug('Initializing Cloudflare instance')
+        log.debug("Initializing Cloudflare instance")
         cloudflare = Cloudflare(preferences)
         while continue_running:
             try:
                 latest_ip = cloudflare.ip
-                log.info(f'Cloudflare\'s IP: {latest_ip}')
+                log.info(f"Cloudflare's IP: {latest_ip}")
                 current_ip = await get_machine_public_ip()
                 log.info(f"Current machine IP: {current_ip}")
                 if current_ip != latest_ip:
-                    log.warning(f'IP changed! {latest_ip} -> {current_ip}')
+                    log.warning(f"IP changed! {latest_ip} -> {current_ip}")
                     cloudflare.ip = current_ip
-                    log.info('Correctly updated Cloudflare\'s DNS IP')
+                    log.info("Correctly updated Cloudflare's DNS IP")
 
             except socket.gaierror:
-                log.warning('DNS name resolution failure! Check settings')
+                log.warning("DNS name resolution failure! Check settings")
             except requests.exceptions.HTTPError as httperr:
-                log.critical('HTTP error when accessing '
-                             f'{httperr.request}!\n{httperr}')
+                log.critical(
+                    "HTTP error when accessing " f"{httperr.request}!\n{httperr}"
+                )
             finally:
                 if single_run:
-                    log.info('User requested single run. Exiting...')
+                    log.info("User requested single run. Exiting...")
                     break
                 await asyncio.sleep(preferences.frequency * 60)
     except KeyboardInterrupt:
@@ -77,11 +79,15 @@ async def main(preferences: Preferences,
         exit_code = 130
     except Exception as e:
         log.fatal(f'Unexpected exception registered! "{str(e)}"')
-        log.fatal(f'Please, submit the following traceback at {PROJECT_URL} '
-                  f'or email it at {DEVELOPER_MAIL}')
-        log.fatal("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Stacktrace:\n"
-                  f"{traceback.format_exc()}\n"
-                  "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<")
+        log.fatal(
+            f"Please, submit the following traceback at {PROJECT_URL} "
+            f"or email it at {DEVELOPER_MAIL}"
+        )
+        log.fatal(
+            "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Stacktrace:\n"
+            f"{traceback.format_exc()}\n"
+            "<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"
+        )
         exit_code = 1
     finally:
         await preferences.save_async()
@@ -107,105 +113,122 @@ async def parser():
         Signal listeners are attached.
      6. The application forks and starts running in background as a daemon.
     """
-    args = ArgumentParser(prog='cloudflare-ddns',
-                          description=DESCRIPTION,
-                          allow_abbrev=False)
-    args.add_argument("--domain",
-                      type=str,
-                      default=None,
-                      help="Cloudflare domain to be updated.")
-    args.add_argument("--name",
-                      metavar='RECORD NAME',
-                      type=str,
-                      default=None,
-                      help="Cloudflare Record's name to update.")
-    args.add_argument("--type",
-                      metavar="RECORD TYPE",
-                      default='A',
-                      help="Cloudflare Record's type to update. "
-                           "Defaults to 'A'",
-                      choices=sorted(VALID_RECORD_TYPES))
-    args.add_argument("--ttl",
-                      default=1,
-                      type=int,
-                      help="DNS record's TTL (Time To Live) value. Defaults "
-                           "to '1' (automatic)")
-    args.add_argument("--time",
-                      type=int,
-                      default=5,
-                      help="Time (in minutes) to check for updated IP "
-                           "(defaults: 5 min.) - must be higher than 0.")
-    args.add_argument("--key",
-                      type=str,
-                      default=None,
-                      metavar='API-KEY',
-                      help="Cloudflare API key.")
-    args.add_argument("--mail",
-                      type=str,
-                      default=None,
-                      help="Cloudflare sign-in mail.")
-    args.add_argument("--proxied",
-                      action="store_true",
-                      default=False,
-                      help="Set this value if you want your 'A' Record to be "
-                           "behind the Cloudflare proxy "
-                           "(disabled by default).")
-    args.add_argument("--no-daemonize",
-                      action="store_true",
-                      default=False,
-                      help="By default, the program runs as a daemon in "
-                           "background. With this option enabled, "
-                           "the program will run only once and then exit.")
-    args.add_argument("--init-config",
-                      action="store_true",
-                      default=False,
-                      help="Creates the configuration file at the specific "
-                           "location with no contents but the keys with no"
-                           "values (ready to be full-filled). When this "
-                           "option is set, the program creates the file and "
-                           "exits.")
-    args.add_argument("--config-file",
-                      type=str,
-                      default=f"{Path.home()}/.config/cloudflare-ddns.ini",
-                      metavar="PATH",
-                      help="Defines the daemon's config file location. "
-                           "Defaults to: \"~/.config/cloudflare-ddns.ini\"")
-    args.add_argument("--pid-file",
-                      type=str,
-                      default=None,
-                      metavar="LOCATION",
-                      help="Specifies a custom PID file for storing current "
-                           "daemon PID.")
-    args.add_argument("--log-file",
-                      type=str,
-                      default=None,
-                      metavar="LOCATION",
-                      help="Specifies a custom LOG file for storing current "
-                           "daemon logs.")
-    args.add_argument("--log-level",
-                      type=str,
-                      default="WARNING",
-                      metavar="LEVEL",
-                      help="Specifies the proper log level to use when "
-                           "running. Must be one of: DEBUG, WARN, INFO,"
-                           "CRITICAL, ERROR, FATAL, logging.NOTSET",
-                      choices=[getLevelName(lvl) for lvl in
-                               VALID_LOGGING_LEVELS])
-    args.add_argument("--console-log",
-                      action="store_true",
-                      help="Enables logging to both console and file. "
-                           "Intended for debugging purposes. Disabled by "
-                           "default.")
-    args.add_argument("--user",
-                      type=str,
-                      default=None,
-                      metavar="USERNAME",
-                      help="Run the daemon as the specified user.")
-    args.add_argument("--group",
-                      type=str,
-                      default=None,
-                      metavar="GROUP-NAME",
-                      help="Run the daemon as the specified group.")
+    args = ArgumentParser(
+        prog="cloudflare-ddns", description=DESCRIPTION, allow_abbrev=False
+    )
+    args.add_argument(
+        "--domain", type=str, default=None, help="Cloudflare domain to be updated."
+    )
+    args.add_argument(
+        "--name",
+        metavar="RECORD NAME",
+        type=str,
+        default=None,
+        help="Cloudflare Record's name to update.",
+    )
+    args.add_argument(
+        "--type",
+        metavar="RECORD TYPE",
+        default="A",
+        help="Cloudflare Record's type to update. " "Defaults to 'A'",
+        choices=sorted(VALID_RECORD_TYPES),
+    )
+    args.add_argument(
+        "--ttl",
+        default=1,
+        type=int,
+        help="DNS record's TTL (Time To Live) value. Defaults " "to '1' (automatic)",
+    )
+    args.add_argument(
+        "--time",
+        type=int,
+        default=5,
+        help="Time (in minutes) to check for updated IP "
+        "(defaults: 5 min.) - must be higher than 0.",
+    )
+    args.add_argument(
+        "--key", type=str, default=None, metavar="API-KEY", help="Cloudflare API key."
+    )
+    args.add_argument("--mail", type=str, default=None, help="Cloudflare sign-in mail.")
+    args.add_argument(
+        "--proxied",
+        action="store_true",
+        default=False,
+        help="Set this value if you want your 'A' Record to be "
+        "behind the Cloudflare proxy "
+        "(disabled by default).",
+    )
+    args.add_argument(
+        "--no-daemonize",
+        action="store_true",
+        default=False,
+        help="By default, the program runs as a daemon in "
+        "background. With this option enabled, "
+        "the program will run only once and then exit.",
+    )
+    args.add_argument(
+        "--init-config",
+        action="store_true",
+        default=False,
+        help="Creates the configuration file at the specific "
+        "location with no contents but the keys with no"
+        "values (ready to be full-filled). When this "
+        "option is set, the program creates the file and "
+        "exits.",
+    )
+    args.add_argument(
+        "--config-file",
+        type=str,
+        default=f"{Path.home()}/.config/cloudflare-ddns.ini",
+        metavar="PATH",
+        help="Defines the daemon's config file location. "
+        'Defaults to: "~/.config/cloudflare-ddns.ini"',
+    )
+    args.add_argument(
+        "--pid-file",
+        type=str,
+        default=None,
+        metavar="LOCATION",
+        help="Specifies a custom PID file for storing current " "daemon PID.",
+    )
+    args.add_argument(
+        "--log-file",
+        type=str,
+        default=None,
+        metavar="LOCATION",
+        help="Specifies a custom LOG file for storing current " "daemon logs.",
+    )
+    args.add_argument(
+        "--log-level",
+        type=str,
+        default="WARNING",
+        metavar="LEVEL",
+        help="Specifies the proper log level to use when "
+        "running. Must be one of: DEBUG, WARN, INFO,"
+        "CRITICAL, ERROR, FATAL, logging.NOTSET",
+        choices=[getLevelName(lvl) for lvl in VALID_LOGGING_LEVELS],
+    )
+    args.add_argument(
+        "--console-log",
+        action="store_true",
+        help="Enables logging to both console and file. "
+        "Intended for debugging purposes. Disabled by "
+        "default.",
+    )
+    args.add_argument(
+        "--user",
+        type=str,
+        default=None,
+        metavar="USERNAME",
+        help="Run the daemon as the specified user.",
+    )
+    args.add_argument(
+        "--group",
+        type=str,
+        default=None,
+        metavar="GROUP-NAME",
+        help="Run the daemon as the specified group.",
+    )
     p_args = args.parse_args()
     try:
         Preferences.file = p_args.config_file
@@ -214,48 +237,49 @@ async def parser():
                 print(f'Created configuration file at "{Preferences.file}"')
                 exit(0)
             else:
-                print('File already exists! Not doing anything...')
+                print("File already exists! Not doing anything...")
                 exit(1)
 
         preferences = await Preferences.create_from_args(p_args)
 
-        log = init_logging(log_file=preferences.logging_file,
-                           file_level=preferences.logging_level,
-                           console_level=preferences.logging_level,
-                           log_to_console=p_args.console_log)
+        log = init_logging(
+            log_file=preferences.logging_file,
+            file_level=preferences.logging_level,
+            console_level=preferences.logging_level,
+            log_to_console=p_args.console_log,
+        )
 
-        log.debug('Logger initialized')
+        log.debug("Logger initialized")
 
         fds = []
         for handler in log.handlers:
             if isinstance(handler, RotatingFileHandler):
                 fds.append(handler.stream.fileno())
-        log.debug('Saving logger file descriptor for avoiding closing it')
+        log.debug("Saving logger file descriptor for avoiding closing it")
 
         uid = getpwnam(p_args.user) if p_args.user is not None else None
         gid = getgrnam(p_args.group) if p_args.group is not None else None
 
-        log.debug(f'Running daemon as {uid}:{gid} (UID:GID)')
+        log.debug(f"Running daemon as {uid}:{gid} (UID:GID)")
 
-        log.debug(f'Creating locked PID file at {preferences.pid_file}')
+        log.debug(f"Creating locked PID file at {preferences.pid_file}")
         pid_file = daemon.pidfile.PIDLockFile(preferences.pid_file)
 
         def handle_sigterm(*_):
             try:
-                log.warning('SIGTERM received! Finishing...')
+                log.warning("SIGTERM received! Finishing...")
                 preferences.save()
-                log.info('Cloudflare DDNS finished correctly')
+                log.info("Cloudflare DDNS finished correctly")
                 for handler in log.handlers:
                     handler.close()
                 exit(0)
             except Exception as e:
-                log.fatal(f'Unable to finish correctly! - {e}',
-                          exc_info=True)
+                log.fatal(f"Unable to finish correctly! - {e}", exc_info=True)
                 exit(1)
             finally:
                 pid_file.break_lock()
 
-        log.debug('Initializing daemon context')
+        log.debug("Initializing daemon context")
         context = daemon.DaemonContext(
             working_directory=Path.home(),
             umask=0o002,
@@ -263,14 +287,15 @@ async def parser():
             files_preserve=fds,
             signal_map={
                 signal.SIGTERM: handle_sigterm,
-                signal.SIGHUP: lambda *_:
-                log.warning('Reloading preferences!') and preferences.reload()
+                signal.SIGHUP: lambda *_: log.warning("Reloading preferences!")
+                and preferences.reload(),
             },
             uid=uid,
-            gid=gid
+            gid=gid,
         )
-        log.info('Forking daemon. Future logs available at: '
-                 f'{preferences.logging_file}')
+        log.info(
+            "Forking daemon. Future logs available at: " f"{preferences.logging_file}"
+        )
 
         with context:
             exit(launch(main, preferences, log, single_run=p_args.no_daemonize))
@@ -280,6 +305,5 @@ async def parser():
         except NameError:
             pass
         finally:
-            print(f"{Back.RED}Error: {str(err)}{Style.RESET_ALL}",
-                  file=sys.stderr)
+            print(f"{Back.RED}Error: {str(err)}{Style.RESET_ALL}", file=sys.stderr)
             exit(1)

@@ -18,20 +18,17 @@ import logging
 
 from logging.handlers import RotatingFileHandler
 from typing import Optional
-from .. import (
-    LOG_FILE,
-    LOG_DEFAULT_FORMAT,
-    DEV_CONSOLE_LOG_LEVEL,
-    DEV_FILE_LOG_LEVEL
-)
+from .. import LOG_FILE, LOG_DEFAULT_FORMAT, DEV_CONSOLE_LOG_LEVEL, DEV_FILE_LOG_LEVEL
 
 
-def init_logging(logger_name: Optional[str] = None,
-                 log_file: Optional[str] = LOG_FILE,
-                 console_level: int = DEV_CONSOLE_LOG_LEVEL,
-                 file_level: int = DEV_FILE_LOG_LEVEL,
-                 log_format: str = LOG_DEFAULT_FORMAT,
-                 log_to_console: bool = False) -> logging:
+def init_logging(
+    logger_name: Optional[str] = None,
+    log_file: Optional[str] = LOG_FILE,
+    console_level: int = DEV_CONSOLE_LOG_LEVEL,
+    file_level: int = DEV_FILE_LOG_LEVEL,
+    log_format: str = LOG_DEFAULT_FORMAT,
+    log_to_console: bool = False,
+) -> logging:
     """
     Creates a custom logging that outputs to both console and file, if
     filename provided. Automatically cleans-up old logs during runtime and
@@ -80,10 +77,9 @@ def init_logging(logger_name: Optional[str] = None,
 
     if log_file:
         old_log = os.path.exists(log_file)
-        file_handler = RotatingFileHandler(log_file,
-                                           mode='a',
-                                           maxBytes=2 << 20,
-                                           backupCount=5)
+        file_handler = RotatingFileHandler(
+            log_file, mode="a", maxBytes=2 << 20, backupCount=5
+        )
         file_handler.rotator = file_rotator
         file_handler.namer = namer
         file_handler.setLevel(file_level)

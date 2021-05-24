@@ -19,15 +19,11 @@ from typing import Optional, TypeVar
 PathT = TypeVar("PathT", str, bytes, os.PathLike)
 
 
-def ensure_permissions(path: PathT,
-                       perms: int,
-                       dir_fd: Optional[int] = None) -> bool:
+def ensure_permissions(path: PathT, perms: int, dir_fd: Optional[int] = None) -> bool:
     st = os.stat(path, dir_fd=dir_fd)
     return bool(st.st_mode & perms)
 
 
-def change_permissions(path: PathT,
-                       perms: int,
-                       dir_fd=None):
+def change_permissions(path: PathT, perms: int, dir_fd=None):
     os.chown(path, os.geteuid(), os.getegid(), dir_fd=dir_fd)
     os.chmod(path, perms, dir_fd=dir_fd)

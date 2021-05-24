@@ -27,7 +27,9 @@ def cached(cached_prop: str):
                     d[key] = res
                 return res
             return d[key]
+
         return wrapper
+
     return cache_decorator
 
 
@@ -38,5 +40,7 @@ def ucached(cached_prop: str):
             key = func.__name__
             d[key] = new_value
             func(self, new_value)
+
         return wrapper
+
     return cache_decorator

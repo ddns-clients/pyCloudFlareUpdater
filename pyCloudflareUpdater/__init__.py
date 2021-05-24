@@ -28,7 +28,7 @@ from .utils import (
     PROJECT_URL,
     DEVELOPER_MAIL,
     VALID_RECORD_TYPES,
-    VERSION
+    VERSION,
 )
 
 from .utils import (
@@ -37,7 +37,7 @@ from .utils import (
     PathT,
     is_none_or_empty,
     cached,
-    ucached
+    ucached,
 )
 
 from .network import Cloudflare, get_machine_public_ip
